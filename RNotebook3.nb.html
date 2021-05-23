@@ -215,9 +215,8 @@ pre code {
 
 
 <!-- rnb-text-begin -->
-<p>This is an <a href="http://rmarkdown.rstudio.com">R Markdown</a> Notebook. When you execute code within the notebook, the results appear beneath the code.</p>
 <p>Isotope Dendrochronology Calculation and interpretation of physiological indices derived from d13C COURSE: DISC, LTRR, UNIVERSITY OF ARIZONA. INSTRUCTORS: S. BELMECHERI &amp; P. SZEJNER</p>
-<p>The following code and comments should further your experience to use tree ring and atmospheric d13C data to calculate WUE and other physiological indices using R. This exercise relies upon raw tree-ring d13C measurements, atmospheric d13C measurements, and uses the Farqhuar 1982 model.</p>
+<p>The following code and comments should further your experience using tree ring and atmospheric d13C data to calculate WUE and other physiological indices. This exercise relies upon raw tree-ring d13C measurements, atmospheric d13C measurements, and uses the Farqhuar 1982 model.</p>
 <p>There are a few questions throughout to catalyze understanding and critical thinking. The analysis is broken into 4 main parts -including 20 questions, at the end you should have gone through many of the steps commonly used for reconstructing and interpreting iWUE derived from tree ring d13C. You will also be familiar with uncertainties related to such calculations and best practices to perform them.</p>
 <div id="part-0-setting-up-directories-and-files" class="section level2">
 <h2>PART 0: Setting up directories and files</h2>
@@ -230,392 +229,893 @@ pre code {
 <p>You will need to change the directory in R so that this is the working directory. The command “setwd” is used for this as in the following line:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2V0d2QoXCJ+L0RvY3VtZW50cy9ESVNDL05PVEVCT09LM1wiKVxuYGBgIn0= -->
-<pre class="r"><code>setwd(&quot;~/Documents/DISC/NOTEBOOK3&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>You will also need to install and load the dplR package, and the rpmodel Correction Package:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkcGxSKVxubGlicmFyeShycG1vZGVsKVxuYGBgIn0= -->
-<pre class="r"><code>library(dplR)
-library(rpmodel)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>You should see the above file names (and anything else in this directory) when you type (or copy and paste) the following line:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlzdC5maWxlcygpXG5gYGAifQ== -->
-<pre class="r"><code>list.files()</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>If you see these files listed, you’re ready to roll!</p>
-</div>
-<div id="part-1-importing-and-plotting-raw-tree-ring-isotope-data-d13c-atmospheric-data" class="section level2">
-<h2>PART 1: Importing and plotting raw tree-ring isotope data [d13C] &amp; Atmospheric Data</h2>
-<p>Import and plot the raw tree ring d13C dataset:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVFIxMyA8LSB0cygocmVhZC50YWJsZShcIkxJTC50eHRcIiwgaGVhZGVyPVQpKSwgc3RhcnQ9MTkwMSwgZnJlcXVlbmN5PTEpXG50cy5wbG90KFRSMTMudHMseWxhYj1cImQxM0MgKHBlcm1pbC5WUERCKVwiLHhsYWI9XCJZZWFyc1wiLCBjb2w9XCIjOUM5NjRBXCIpXG5gYGAifQ== -->
-<pre class="r"><code>TR13 &lt;- ts((read.table(&quot;LIL.txt&quot;, header=T)), start=1901, frequency=1)
-ts.plot(TR13.ts,ylab=&quot;d13C (permil.VPDB)&quot;,xlab=&quot;Years&quot;, col=&quot;#9C964A&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Import and subset atmospheric data:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuQVRNIDwtIHRzKChyZWFkLnRhYmxlKFwiQVRNLnR4dFwiLCBoZWFkZXI9VCkpLCBzdGFydD0pXG4jIHN1YnNldCBkMTNDXG5BVE0uMTNDIDwtIHRzKEFUTVssXCJhdG0xM0NcIl0sc3RhcnQ9MTkwMSwgZnJlcXVlbmN5PTEpXG4jIHN1YnNldCBDTzJcbkFUTS5DTzIgPC0gdHMoQVRNWyxcImF0bUNPMlwiXSxzdGFydD0xOTAxLCBmcmVxdWVuY3k9MSlcbmBgYCJ9 -->
-<pre class="r"><code>ATM &lt;- ts((read.table(&quot;ATM.txt&quot;, header=T)), start=)
-# subset d13C
-ATM.13C &lt;- ts(ATM[,&quot;atm13C&quot;],start=1901, frequency=1)
-# subset CO2
-ATM.CO2 &lt;- ts(ATM[,&quot;atmCO2&quot;],start=1901, frequency=1)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Plot the raw tree ring d13C and the atmospheric d13C datasets:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGF5b3V0KG1hdHJpeCgxOjIsbnJvdyA9IDEsIG5jb2wgPSAyLGJ5cm93ID0gVCksIHdpZHRocyA9IGMoMywzKSxoZWlnaHRzID0gYygzLDMpLHJlc3BlY3QgPSBUUlVFKVxudHMucGxvdChBVE0uMTNDLHlsYWI9XCJkMTNDIChwZXJtaWwuVlBEQilcIix4bGFiPVwiWWVhcnNcIiwgY29sPVwiIzlDOTY0QVwiLG1haW49XCJkMTNDXCIpXG50cy5wbG90KEFUTS5DTzIseWxhYj1cIkNPMiAocHBtKVwiLHhsYWI9XCJZZWFyc1wiLCBtYWluPVwiQ08yXCIpXG5cbmBgYCJ9 -->
-<pre class="r"><code>layout(matrix(1:2,nrow = 1, ncol = 2,byrow = T), widths = c(3,3),heights = c(3,3),respect = TRUE)
-ts.plot(ATM.13C,ylab=&quot;d13C (permil.VPDB)&quot;,xlab=&quot;Years&quot;, col=&quot;#9C964A&quot;,main=&quot;d13C&quot;)
-ts.plot(ATM.CO2,ylab=&quot;CO2 (ppm)&quot;,xlab=&quot;Years&quot;, main=&quot;CO2&quot;)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Question 1: Compare both trends. Describe and interpret the relationship between the decline in d13C and the increase in CO2 concentration.</p>
-</div>
-<div id="part-2-calculating-iwue--simple-approach" class="section level2">
-<h2>PART 2: Calculating iWUE- SIMPLE APPROACH</h2>
-<p>The Farquhar 1982 biochemical model describes the isotopic discrimination against 13C (Δ13C) during carbon diffusion and fixation by plants. The Farquhar equation can be written as follows:</p>
-<p>Δ13C = a+(b-a)*(ci/ca)</p>
-<p>a=4.4 is the fractionation due to CO2 diffusion in air through the stomata.</p>
-<p>b= 28 is the apparent net fractionation by RuBisCO during carboxylation.</p>
-<p>ci and ca are are the leaf intercellular and ambient partial pressure of CO2 (Pa), respectively.</p>
-<p>From the equation above, ci can be calculated as follows:</p>
-<p>ci = ca*(Δ13C-a)/(b-a)</p>
-<p>We know ca from measurements.ca is in ppm. You use use ca in pmm such as:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBXZSBrbm93IGNhIGZyb20gbWVhc3VyZW1lbnRzLmNhIGlzIGluIHBwbS4geW91IHVzZSB1c2UgaXQgYXMgaXMgXG5jYSA8LSBBVE0uQ08yICMgaW4gcHBtXG5gYGAifQ== -->
-<pre class="r"><code># We know ca from measurements.ca is in ppm. you use use it as is 
-ca &lt;- ATM.CO2 # in ppm</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Or use ca in Pa as follows:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyB5b3UgbmVlZCAgciBwYWNrYWdlIFwicnBtb2RlbFwiXG5saWJyYXJ5KFwicnBtb2RlbFwiKVxuYGBgIn0= -->
-<pre class="r"><code># you need  r package &quot;rpmodel&quot;
-library(&quot;rpmodel&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>and the function calc_patm {rpmodel} to calculate atmospheric pressure at sea level. The variable needed is elevation.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZWx2PSAxNjAwICMgRWxldmF0aW9uIGFib3ZlIHNlYS1sZXZlbCAobS5hLnMubC4pXG5wYXRtPC0gY2FsY19wYXRtKGVsdiwgcGF0bTAgPSAxMDEzMjUpXG5gYGAifQ== -->
-<pre class="r"><code>elv= 1600 # Elevation above sea-level (m.a.s.l.)
-patm&lt;- calc_patm(elv, patm0 = 101325)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>calculate ca as follows:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2EgPC0gKCAxLmUtNiApICogY2EgKiBwYXRtICAjIGluIFBhXG5gYGAifQ== -->
-<pre class="r"><code>ca &lt;- ( 1.e-6 ) * ca * patm  # in Pa</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>convert ca to a time series:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2EgPC0gdHMoY2EsIHN0YXJ0PTE5MDEsIGZyZXF1ZW5jeT0xKVxuYGBgIn0= -->
-<pre class="r"><code>ca &lt;- ts(ca, start=1901, frequency=1)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Δ13C can then be calculated as follows:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZDEzQy5kaXNjIDwtIChBVE0uMTNDLVRSMTMpLygxK1RSMTMvMTAwMClcbmBgYCJ9 -->
-<pre class="r"><code>d13C.disc &lt;- (ATM.13C-TR13)/(1+TR13/1000)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>And ci as follows:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2kgPC0gIGNhKihkMTNDLmRpc2MtYSkvKGItYSlcbmBgYCJ9 -->
-<pre class="r"><code>ci &lt;-  ca*(d13C.disc-a)/(b-a)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>And iwue as follows:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaXd1ZSA8LSAoY2EtY2kpLzEuNlxuYGBgIn0= -->
-<pre class="r"><code>iwue &lt;- (ca-ci)/1.6</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>plot the physiological indices:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGF5b3V0KG1hdHJpeCgxOjYsbnJvdyA9IDMsIG5jb2wgPSAyLGJ5cm93ID0gRiksIHdpZHRocyA9IGMoMywzLDMpLGhlaWdodHMgPSBjKDMsMywzKSxyZXNwZWN0ID0gVFJVRSlcblxudHMucGxvdChUUjEzLHlsYWI9XCJkMTNDIChwZXJtaWwuVlBEQilcIix4bGFiPVwiWWVhcnNcIiwgbWFpbj1cIk9CU0VSVkFUSU9OU1wiKVxudHMucGxvdChkMTNDLmRpc2MseWxhYj1cIkQxM0MgKHBlcm1pbC5WUERCKVwiLHhsYWI9XCJZZWFyc1wiLCBtYWluPVwiXCIpXG50cy5wbG90KGNhLHlsYWI9XCJDTzIgKHBhKVwiLHhsYWI9XCJZZWFyc1wiLCBtYWluPVwiXCIpXG50cy5wbG90KGNpLHlsYWI9XCJjaSAocGEpXCIseGxhYj1cIlllYXJzXCIsIG1haW49XCJGQVJRVUhBUi1NT0RFTFwiKVxudHMucGxvdChpd3VlLHlsYWI9XCIgaXd1ZSAodW1vbC9tb2wpXCIseGxhYj1cIlllYXJzXCIsIG1haW49XCJcIilcbnRzLnBsb3QoY2kvY2EseWxhYj1cImNpL2NhXCIseGxhYj1cIlllYXJzXCIsIG1haW49XCJcIilcblxuYGBgIn0= -->
-<pre class="r"><code>layout(matrix(1:6,nrow = 3, ncol = 2,byrow = F), widths = c(3,3,3),heights = c(3,3,3),respect = TRUE)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc2V0d2QoXFx+L0RvY3VtZW50cy9ESVNDL05PVEVCT09LM1xcKVxuYGBgXG5gYGAifQ== -->
+<pre class="r"><code>```r
+setwd(\~/Documents/DISC/NOTEBOOK3\)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
 
-ts.plot(TR13,ylab=&quot;d13C (permil.VPDB)&quot;,xlab=&quot;Years&quot;, main=&quot;OBSERVATIONS&quot;)
-ts.plot(d13C.disc,ylab=&quot;D13C (permil.VPDB)&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;)
-ts.plot(ca,ylab=&quot;CO2 (pa)&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;)
-ts.plot(ci,ylab=&quot;ci (pa)&quot;,xlab=&quot;Years&quot;, main=&quot;FARQUHAR-MODEL&quot;)
-ts.plot(iwue,ylab=&quot; iwue (umol/mol)&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;)
-ts.plot(ci/ca,ylab=&quot;ci/ca&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;)
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+You will also need to install and load the dplR package, and the rpmodel Correction Package:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubGlicmFyeShkcGxSKVxubGlicmFyeShycG1vZGVsKVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+library(dplR)
+library(rpmodel)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+You should see the above file names (and anything else in this directory) when you type (or copy and paste) the following line:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubGlzdC5maWxlcygpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+list.files()</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+If you see these files listed, you&#39;re ready to roll!
+
+## PART 1: Importing and plotting raw tree-ring isotope data [d13C] &amp; Atmospheric Data 
+
+Import and plot the raw tree ring d13C dataset:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuVFIxMyA8LSB0cygocmVhZC50YWJsZShcXExJTC50eHRcXCwgaGVhZGVyPVQpKSwgc3RhcnQ9MTkwMSwgZnJlcXVlbmN5PTEpXG50cy5wbG90KFRSMTMudHMseWxhYj1cXGQxM0MgKHBlcm1pbC5WUERCKVxcLHhsYWI9XFxZZWFyc1xcLCBjb2w9XFwjOUM5NjRBXFwpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+TR13 &lt;- ts((read.table(\LIL.txt\, header=T)), start=1901, frequency=1)
+ts.plot(TR13.ts,ylab=\d13C (permil.VPDB)\,xlab=\Years\, col=\#9C964A\)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+ 
+Import and subset atmospheric data: 
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuQVRNIDwtIHRzKChyZWFkLnRhYmxlKFxcQVRNLnR4dFxcLCBoZWFkZXI9VCkpLCBzdGFydD0pXG4jIHN1YnNldCBkMTNDXG5BVE0uMTNDIDwtIHRzKEFUTVssXFxhdG0xM0NcXF0sc3RhcnQ9MTkwMSwgZnJlcXVlbmN5PTEpXG4jIHN1YnNldCBDTzJcbkFUTS5DTzIgPC0gdHMoQVRNWyxcXGF0bUNPMlxcXSxzdGFydD0xOTAxLCBmcmVxdWVuY3k9MSlcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+ATM &lt;- ts((read.table(\ATM.txt\, header=T)), start=)
+# subset d13C
+ATM.13C &lt;- ts(ATM[,\atm13C\],start=1901, frequency=1)
+# subset CO2
+ATM.CO2 &lt;- ts(ATM[,\atmCO2\],start=1901, frequency=1)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+Plot the raw tree ring d13C  and the atmospheric d13C datasets:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubGF5b3V0KG1hdHJpeCgxOjIsbnJvdyA9IDEsIG5jb2wgPSAyLGJ5cm93ID0gVCksIHdpZHRocyA9IGMoMywzKSxoZWlnaHRzID0gYygzLDMpLHJlc3BlY3QgPSBUUlVFKVxudHMucGxvdChBVE0uMTNDLHlsYWI9XFxkMTNDIChwZXJtaWwuVlBEQilcXCx4bGFiPVxcWWVhcnNcXCwgY29sPVxcIzlDOTY0QVxcLG1haW49XFxkMTNDXFwpXG50cy5wbG90KEFUTS5DTzIseWxhYj1cXENPMiAocHBtKVxcLHhsYWI9XFxZZWFyc1xcLCBtYWluPVxcQ08yXFwpXG5cbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+layout(matrix(1:2,nrow = 1, ncol = 2,byrow = T), widths = c(3,3),heights = c(3,3),respect = TRUE)
+ts.plot(ATM.13C,ylab=\d13C (permil.VPDB)\,xlab=\Years\, col=\#9C964A\,main=\d13C\)
+ts.plot(ATM.CO2,ylab=\CO2 (ppm)\,xlab=\Years\, main=\CO2\)
 </code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Question 2: Describe the trends of the various physiological indices.</p>
-<p>Question 3: Based on what you have learned in the Isotope theory lectures, describe the trees’physiological response over time at this site.</p>
-</div>
-<div id="part-3-calculating-iwue--comprehensive-approach" class="section level2">
-<h2>PART 3: Calculating iWUE- COMPREHENSIVE APPROACH</h2>
-<p>In the Farquhar model, the d13C is the isotopic ratio for sugars fixed in the leaf. For tree-ring cellulose, a correction factor is used to account for the offset of d13C between leaf sugars and tree-ring cellulose. The offset results from post-photosynthetic fractionation processes (Gessler et al., 2014).</p>
-<p>The offset between whole wood and leaves is ~1.3 ± 0.2‰ for oak and conifer species. Additional isotopic offsets include the difference between tree-ring cellulose and bulk wood with an average value of ~1.3 ± 0.2‰, and isotopic depletion between primary assimilates and bulk leaf with values of -0.5 ± 1‰.</p>
-<p>Upscaling d13C measurements from tree rings to the leaf level can significantly improve estimates of Δ13C and hence reduce uncertainties in the determination of the ratio of ci to ca.</p>
-<p>We can scale tree ring d13 to leaf level using a factor d.</p>
-<p>d represents the sum of post-photosynthetic isotope fractionations between the leaf organic matter and the plant material considered. Choose the d value based on the studied material ( for this site, it is cellulose)</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZD0xLjkgIyBmb3IgZDEzQyBtZWFzdXJlZCBpbiB3b29kXG5kPTIuMSAjIGZvciBkMTNDIG1lYXN1cmVkIGluIGNlbGx1bG9zZVxuYGBgIn0= -->
-<pre class="r"><code>d=1.9 # for d13C measured in wood
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+ 
+Question 1: Compare both trends. Describe and interpret the relationship between the decline in d13C and the increase in CO2 concentration. 
+
+## PART 2: Calculating iWUE- SIMPLE APPROACH 
+
+The Farquhar 1982 biochemical model  describes the isotopic discrimination against 13C (Δ13C) during carbon diffusion and fixation by plants. The Farquhar equation can be written as follows:
+
+Δ13C = a+(b-a)*(ci/ca)
+
+a=4.4 is the fractionation due to CO2 diffusion in air through the stomata.
+
+b= 28 is the apparent net fractionation by RuBisCO during carboxylation.
+
+ci and ca are are the leaf intercellular and ambient partial pressure of CO2 (Pa), respectively.
+
+From the equation above, ci can be calculated as follows:
+
+ci =  ca*(Δ13C-a)/(b-a)
+
+We know ca from measurements.ca is in ppm. You use use ca in pmm such as:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyBXZSBrbm93IGNhIGZyb20gbWVhc3VyZW1lbnRzLmNhIGlzIGluIHBwbS4geW91IHVzZSB1c2UgaXQgYXMgaXMgXG5jYSA8LSBBVE0uQ08yICMgaW4gcHBtXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+# We know ca from measurements.ca is in ppm. you use use it as is 
+ca &lt;- ATM.CO2 # in ppm</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+Or use ca in Pa as follows:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyB5b3UgbmVlZCAgciBwYWNrYWdlIFxccnBtb2RlbFxcXG5saWJyYXJ5KFxccnBtb2RlbFxcKVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+# you need  r package \rpmodel\
+library(\rpmodel\)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+and the function calc_patm {rpmodel} to calculate atmospheric pressure at sea level. The variable needed is elevation.
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZWx2PSAxNjAwICMgRWxldmF0aW9uIGFib3ZlIHNlYS1sZXZlbCAobS5hLnMubC4pXG5wYXRtPC0gY2FsY19wYXRtKGVsdiwgcGF0bTAgPSAxMDEzMjUpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+elv= 1600 # Elevation above sea-level (m.a.s.l.)
+patm&lt;- calc_patm(elv, patm0 = 101325)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+calculate ca as follows:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuY2EgPC0gKCAxLmUtNiApICogY2EgKiBwYXRtICAjIGluIFBhXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+ca &lt;- ( 1.e-6 ) * ca * patm  # in Pa</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+convert ca to a time series:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuY2EgPC0gdHMoY2EsIHN0YXJ0PTE5MDEsIGZyZXF1ZW5jeT0xKVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+ca &lt;- ts(ca, start=1901, frequency=1)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+Δ13C can then be calculated as follows:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZDEzQy5kaXNjIDwtIChBVE0uMTNDLVRSMTMpLygxK1RSMTMvMTAwMClcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+d13C.disc &lt;- (ATM.13C-TR13)/(1+TR13/1000)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+And ci as follows:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuY2kgPC0gIGNhKihkMTNDLmRpc2MtYSkvKGItYSlcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+ci &lt;-  ca*(d13C.disc-a)/(b-a)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+And iwue as follows:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaXd1ZSA8LSAoY2EtY2kpLzEuNlxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+iwue &lt;- (ca-ci)/1.6</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+plot the physiological indices:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubGF5b3V0KG1hdHJpeCgxOjYsbnJvdyA9IDMsIG5jb2wgPSAyLGJ5cm93ID0gRiksIHdpZHRocyA9IGMoMywzLDMpLGhlaWdodHMgPSBjKDMsMywzKSxyZXNwZWN0ID0gVFJVRSlcblxudHMucGxvdChUUjEzLHlsYWI9XFxkMTNDIChwZXJtaWwuVlBEQilcXCx4bGFiPVxcWWVhcnNcXCwgbWFpbj1cXE9CU0VSVkFUSU9OU1xcKVxudHMucGxvdChkMTNDLmRpc2MseWxhYj1cXEQxM0MgKHBlcm1pbC5WUERCKVxcLHhsYWI9XFxZZWFyc1xcLCBtYWluPVxcXFwpXG50cy5wbG90KGNhLHlsYWI9XFxDTzIgKHBhKVxcLHhsYWI9XFxZZWFyc1xcLCBtYWluPVxcXFwpXG50cy5wbG90KGNpLHlsYWI9XFxjaSAocGEpXFwseGxhYj1cXFllYXJzXFwsIG1haW49XFxGQVJRVUhBUi1NT0RFTFxcKVxudHMucGxvdChpd3VlLHlsYWI9XFwgaXd1ZSAodW1vbC9tb2wpXFwseGxhYj1cXFllYXJzXFwsIG1haW49XFxcXClcbnRzLnBsb3QoY2kvY2EseWxhYj1cXGNpL2NhXFwseGxhYj1cXFllYXJzXFwsIG1haW49XFxcXClcblxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+layout(matrix(1:6,nrow = 3, ncol = 2,byrow = F), widths = c(3,3,3),heights = c(3,3,3),respect = TRUE)
+
+ts.plot(TR13,ylab=\d13C (permil.VPDB)\,xlab=\Years\, main=\OBSERVATIONS\)
+ts.plot(d13C.disc,ylab=\D13C (permil.VPDB)\,xlab=\Years\, main=\\)
+ts.plot(ca,ylab=\CO2 (pa)\,xlab=\Years\, main=\\)
+ts.plot(ci,ylab=\ci (pa)\,xlab=\Years\, main=\FARQUHAR-MODEL\)
+ts.plot(iwue,ylab=\ iwue (umol/mol)\,xlab=\Years\, main=\\)
+ts.plot(ci/ca,ylab=\ci/ca\,xlab=\Years\, main=\\)
+</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+Question 2: Describe the trends of the various physiological indices.
+
+Question 3: Based on what you have learned in the Isotope theory lectures, describe the trees&#39;physiological response over time at this site.
+
+
+## PART 3: Calculating iWUE- COMPREHENSIVE APPROACH 
+
+In the Farquhar model, the d13C is the isotopic ratio for sugars fixed in the leaf. For tree-ring cellulose, a correction factor is used to account for the offset of d13C between leaf sugars and tree-ring cellulose. The offset results from post-photosynthetic fractionation processes (Gessler et al., 2014). 
+
+The offset between whole wood and leaves is ~1.3 ± 0.2‰ for oak and conifer species. Additional isotopic offsets include the difference between tree-ring cellulose and bulk wood with an average value of ~1.3 ± 0.2‰, and isotopic depletion between primary assimilates and bulk leaf with values of -0.5 ± 1‰. 
+
+Upscaling d13C measurements from tree rings to the leaf level can significantly improve estimates of Δ13C and hence reduce uncertainties in the determination of the ratio of ci to ca.
+
+We can scale tree ring d13 to leaf level using a factor d.
+
+d represents the sum of post-photosynthetic isotope fractionations between the leaf organic matter and the plant material considered. Choose the d value based on the studied material ( for this site, it is cellulose)
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZD0xLjkgIyBmb3IgZDEzQyBtZWFzdXJlZCBpbiB3b29kXG5kPTIuMSAjIGZvciBkMTNDIG1lYXN1cmVkIGluIGNlbGx1bG9zZVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+d=1.9 # for d13C measured in wood
 d=2.1 # for d13C measured in cellulose</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>This correction can be made as follows:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZDEzQy5kaXNjLmxlYWYgPC0gKEFUTS4xM0MtKFRSMTMtZCkpLygxKyhUUjEzLWQpLzEwMDApXG5gYGAifQ== -->
-<pre class="r"><code>d13C.disc.leaf &lt;- (ATM.13C-(TR13-d))/(1+(TR13-d)/1000)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Leaf level ci can be calculated as follows:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2kubGVhZiA8LSAgY2EqKGQxM0MuZGlzYy5sZWFmLWEpLyhiLWEpXG5gYGAifQ== -->
-<pre class="r"><code>ci.leaf &lt;-  ca*(d13C.disc.leaf-a)/(b-a)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Leaf level iwue can be calculated as follows:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaXd1ZS5sZWFmIDwtIChjYS1jaS5sZWFmKS8xLjZcbmBgYCJ9 -->
-<pre class="r"><code>iwue.leaf &lt;- (ca-ci.leaf)/1.6</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>now add the leaf level physiological indices to the previous plot:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGF5b3V0KG1hdHJpeCgxOjYsbnJvdyA9IDMsIG5jb2wgPSAyLGJ5cm93ID0gRiksIHdpZHRocyA9IGMoMywzLDMpLGhlaWdodHMgPSBjKDMsMywzKSxyZXNwZWN0ID0gVFJVRSlcbiMgTm90ZSB5b3UgbWlnaHQgbmVlZCB0byBhZGp1c3QgdGhlIHlsaW0gdmFsdWVzLlxudHMucGxvdChUUjEzLHlsYWI9XCJkMTNDIChwZXJtaWwuVlBEQilcIix4bGFiPVwiWWVhcnNcIiwgbWFpbj1cIk9CU0VSVkFUSU9OU1wiKVxudHMucGxvdChkMTNDLmRpc2MseWxhYj1cIkQxM0MgKHBlcm1pbC5WUERCKVwiLHhsYWI9XCJZZWFyc1wiLCBtYWluPVwiXCIpOyBsaW5lcyhkMTNDLmRpc2MubGVhZiwgY29sPVwiIzBCNzc1RVwiKVxudHMucGxvdChjYSx5bGFiPVwiQ08yIChwcG0pXCIseGxhYj1cIlllYXJzXCIsIG1haW49XCJcIilcbnRzLnBsb3QoY2kseWxhYj1cImNpIChwYSlcIix4bGFiPVwiWWVhcnNcIiwgbWFpbj1cIkZBUlFVSEFSLU1PREVMXCIpOyBsaW5lcyhjaS5sZWFmLCBjb2w9XCIjMEI3NzVFXCIpXG50cy5wbG90KGl3dWUseWxhYj1cIiBpd3VlICh1bW9sL21vbClcIix4bGFiPVwiWWVhcnNcIiwgbWFpbj1cIlwiKTsgbGluZXMoaXd1ZS5sZWFmLCBjb2w9XCIjMEI3NzVFXCIpXG50cy5wbG90KGNpL2NhLHlsYWI9XCJjaS9jYVwiLHhsYWI9XCJZZWFyc1wiLCBtYWluPVwiXCIpOyBsaW5lcyhjaS5sZWFmL2NhLCBjb2w9XCIjMEI3NzVFXCIpXG5gYGAifQ== -->
-<pre class="r"><code>layout(matrix(1:6,nrow = 3, ncol = 2,byrow = F), widths = c(3,3,3),heights = c(3,3,3),respect = TRUE)
-# Note you might need to adjust the ylim values.
-ts.plot(TR13,ylab=&quot;d13C (permil.VPDB)&quot;,xlab=&quot;Years&quot;, main=&quot;OBSERVATIONS&quot;)
-ts.plot(d13C.disc,ylab=&quot;D13C (permil.VPDB)&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;); lines(d13C.disc.leaf, col=&quot;#0B775E&quot;)
-ts.plot(ca,ylab=&quot;CO2 (ppm)&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;)
-ts.plot(ci,ylab=&quot;ci (pa)&quot;,xlab=&quot;Years&quot;, main=&quot;FARQUHAR-MODEL&quot;); lines(ci.leaf, col=&quot;#0B775E&quot;)
-ts.plot(iwue,ylab=&quot; iwue (umol/mol)&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;); lines(iwue.leaf, col=&quot;#0B775E&quot;)
-ts.plot(ci/ca,ylab=&quot;ci/ca&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;); lines(ci.leaf/ca, col=&quot;#0B775E&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Question 4: What differences do you observe between physiological indices at stem level and leaf level?</p>
-<p>The version of the Farquhar model we used above is a simplified description of the isotopic discrimination. It does not include the fractionation effects during the transfer of CO2 from substomatal cavities to the site of fixation via the mesophyll, and during mitochondrial respiration and photorespiration. While the mesophyll fractionation and their values remain highly unconstrained, recent studies have recommendedthe inclusion of the photorespiratory effect in the discrimination model as this term contributes to an increase of Δ13C with ca rise by 0.004‰ ppm-1 (Keeling et al., 2017; Lavergne et al., 2019).</p>
-<p>A Farquhar model that includes the photorespiratory term is as follows:</p>
-<p>Δ13C = a+(b-a)<em>(ci/ca) -f</em>(Gst/ca)</p>
-<p>The photorespiratory term is the: f*(Gst/ca)</p>
-<p>The fractionation due to photorespiration, f, is 12 permil.</p>
-<p>Gst (or Γ*, Gamma Star) is the CO2 compensation point in the absence of mitochondrial respiration (Pa), it is calculated from the temperature (T) and atmospheric pressure response.You can use the calc_gammastar(tc, patm) function from the rpmodel to calculate Gamma Star</p>
-<p>Based on Notebook 1 and the temperature file, define the appropriate temperature window (e.g.average growing season). This has to be a Time series of site level temperature variability during the summer or growing season or relevant season for trees at this site. Below is an example for summer (June-July-August):</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ3JpZGRlZC50dC5kYXRhIDwtIHRzKHJlYWQudGFibGUoXCJDUlVfVFQudHh0XCIsaGVhZGVyPVQpLHN0YXJ0PTE5MDEsZnJlcXVlbmN5PTEpXG50dC5KSkEgPC0gcm93TWVhbnMoZ3JpZGRlZC50dC5kYXRhWyxjKDYsNyw4KV0pXG50dC5KSkEgPC0gdHModHQuTWFyX0p1bixzdGFydD0xOTAxLGZyZXF1ZW5jeSA9MSlcbmBgYCJ9 -->
-<pre class="r"><code>gridded.tt.data &lt;- ts(read.table(&quot;CRU_TT.txt&quot;,header=T),start=1901,frequency=1)
-tt.JJA &lt;- rowMeans(gridded.tt.data[,c(6,7,8)])
-tt.JJA &lt;- ts(tt.Mar_Jun,start=1901,frequency =1)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Calculate gamma star as follows:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGMgPC0gdHQuSkpBICMgYW5kIHBhdG0gaGFzIGJlZW4gZGVmaW5lZCBlYXJsaWVyLlxuR3N0IDwtIGNhbGNfZ2FtbWFzdGFyKHRjLCBwYXRtKVxuYGBgIn0= -->
-<pre class="r"><code>tc &lt;- tt.JJA # and patm has been defined earlier.
-Gst &lt;- calc_gammastar(tc, patm)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>And the photorespiratory term as follows:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGhvdG9yZXNwX3Rlcm0gPC0gMTIqKEdzdC9jYSkgIyBjYSBpcyAgaW4gUGFcbmBgYCJ9 -->
-<pre class="r"><code>photoresp_term &lt;- 12*(Gst/ca) # ca is  in Pa</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Calculate ci to include photorespiration:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2kubGVhZi5waG90byA8LSAgY2EqKGQxM0MuZGlzYy5sZWFmLWErcGhvdG9yZXNwX3Rlcm0pLyhiLWEpXG5gYGAifQ== -->
-<pre class="r"><code>ci.leaf.photo &lt;-  ca*(d13C.disc.leaf-a+photoresp_term)/(b-a)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>And iwue to include photorespiration:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaXd1ZS5sZWFmLnBob3RvIDwtIChjYS1jaS5sZWFmLnBob3RvKS8xLjZcbmBgYCJ9 -->
-<pre class="r"><code>iwue.leaf.photo &lt;- (ca-ci.leaf.photo)/1.6</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Plot the leaf level physiological parameters using the simple and photorespiration models:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5sYXlvdXQobWF0cml4KDE6Nixucm93ID0gMywgbmNvbCA9IDIsYnlyb3cgPSBGKSwgd2lkdGhzID0gYygzLDMsMyksaGVpZ2h0cyA9IGMoMywzLDMpLHJlc3BlY3QgPSBUUlVFKVxuIyBOb3RlIHlvdSBtaWdodCBuZWVkIHRvIGFkanVzdCB0aGUgeWxpbSB2YWx1ZXMuXG50cy5wbG90KFRSMTMseWxhYj1cImQxM0MgKHBlcm1pbC5WUERCKVwiLHhsYWI9XCJZZWFyc1wiLCBtYWluPVwiT0JTRVJWQVRJT05TXCIpXG50cy5wbG90KGQxM0MuZGlzYy5sZWFmLHlsYWI9XCJEMTNDIChwZXJtaWwuVlBEQilcIix4bGFiPVwiWWVhcnNcIiwgbWFpbj1cIlwiKVxudHMucGxvdChjYSx5bGFiPVwiQ08yIChwYSlcIix4bGFiPVwiWWVhcnNcIiwgbWFpbj1cIlwiKVxudHMucGxvdChjaS5sZWFmLHlsYWI9XCJjaSAocGEpXCIseGxhYj1cIlllYXJzXCIsIG1haW49XCJGQVJRVUhBUl9NT0RFTFwiKTsgbGluZXMoY2kubGVhZi5waG90bywgY29sPVwiIzBCNzc1RVwiKVxudHMucGxvdChpd3VlLmxlYWYseWxhYj1cIiBpd3VlICh1bW9sL21vbClcIix4bGFiPVwiWWVhcnNcIiwgbWFpbj1cIlwiKTsgbGluZXMoaXd1ZS5sZWFmLnBob3RvLCBjb2w9XCIjMEI3NzVFXCIpXG50cy5wbG90KGNpLmxlYWYvY2EseWxhYj1cImNpL2NhXCIseGxhYj1cIlllYXJzXCIsIG1haW49XCJcIik7IGxpbmVzKGNpLmxlYWYucGhvdG8vY2EsIGNvbD1cIiMwQjc3NUVcIilcbmxlZ2VuZChcImJvdHRvbWxlZnRcIixjKFwiU0lNUExFXCIsIFwiUEhPVE9cIiksbHdkPSBjKDEsMSksIGJ0eSA9IFwiblwiLCBjb2w9YyhcImJsYWNrXCIsXCIjMEI3NzVFXCIpLFxuICAgICAgIHRleHQuY29sPWMoXCJibGFja1wiLFwiIzBCNzc1RVwiKSxuY29sPTEpXG5cbmBgYCJ9 -->
-<pre class="r"><code>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+This correction can be made as follows:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZDEzQy5kaXNjLmxlYWYgPC0gKEFUTS4xM0MtKFRSMTMtZCkpLygxKyhUUjEzLWQpLzEwMDApXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+d13C.disc.leaf &lt;- (ATM.13C-(TR13-d))/(1+(TR13-d)/1000)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+Leaf level ci can be calculated as follows:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuY2kubGVhZiA8LSAgY2EqKGQxM0MuZGlzYy5sZWFmLWEpLyhiLWEpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+ci.leaf &lt;-  ca*(d13C.disc.leaf-a)/(b-a)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+Leaf level iwue can be calculated as follows:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaXd1ZS5sZWFmIDwtIChjYS1jaS5sZWFmKS8xLjZcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+iwue.leaf &lt;- (ca-ci.leaf)/1.6</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+now add the leaf level physiological indices to the previous plot:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubGF5b3V0KG1hdHJpeCgxOjYsbnJvdyA9IDMsIG5jb2wgPSAyLGJ5cm93ID0gRiksIHdpZHRocyA9IGMoMywzLDMpLGhlaWdodHMgPSBjKDMsMywzKSxyZXNwZWN0ID0gVFJVRSlcbiMgTm90ZSB5b3UgbWlnaHQgbmVlZCB0byBhZGp1c3QgdGhlIHlsaW0gdmFsdWVzLlxudHMucGxvdChUUjEzLHlsYWI9XFxkMTNDIChwZXJtaWwuVlBEQilcXCx4bGFiPVxcWWVhcnNcXCwgbWFpbj1cXE9CU0VSVkFUSU9OU1xcKVxudHMucGxvdChkMTNDLmRpc2MseWxhYj1cXEQxM0MgKHBlcm1pbC5WUERCKVxcLHhsYWI9XFxZZWFyc1xcLCBtYWluPVxcXFwpOyBsaW5lcyhkMTNDLmRpc2MubGVhZiwgY29sPVxcIzBCNzc1RVxcKVxudHMucGxvdChjYSx5bGFiPVxcQ08yIChwcG0pXFwseGxhYj1cXFllYXJzXFwsIG1haW49XFxcXClcbnRzLnBsb3QoY2kseWxhYj1cXGNpIChwYSlcXCx4bGFiPVxcWWVhcnNcXCwgbWFpbj1cXEZBUlFVSEFSLU1PREVMXFwpOyBsaW5lcyhjaS5sZWFmLCBjb2w9XFwjMEI3NzVFXFwpXG50cy5wbG90KGl3dWUseWxhYj1cXCBpd3VlICh1bW9sL21vbClcXCx4bGFiPVxcWWVhcnNcXCwgbWFpbj1cXFxcKTsgbGluZXMoaXd1ZS5sZWFmLCBjb2w9XFwjMEI3NzVFXFwpXG50cy5wbG90KGNpL2NhLHlsYWI9XFxjaS9jYVxcLHhsYWI9XFxZZWFyc1xcLCBtYWluPVxcXFwpOyBsaW5lcyhjaS5sZWFmL2NhLCBjb2w9XFwjMEI3NzVFXFwpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
 layout(matrix(1:6,nrow = 3, ncol = 2,byrow = F), widths = c(3,3,3),heights = c(3,3,3),respect = TRUE)
 # Note you might need to adjust the ylim values.
-ts.plot(TR13,ylab=&quot;d13C (permil.VPDB)&quot;,xlab=&quot;Years&quot;, main=&quot;OBSERVATIONS&quot;)
-ts.plot(d13C.disc.leaf,ylab=&quot;D13C (permil.VPDB)&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;)
-ts.plot(ca,ylab=&quot;CO2 (pa)&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;)
-ts.plot(ci.leaf,ylab=&quot;ci (pa)&quot;,xlab=&quot;Years&quot;, main=&quot;FARQUHAR_MODEL&quot;); lines(ci.leaf.photo, col=&quot;#0B775E&quot;)
-ts.plot(iwue.leaf,ylab=&quot; iwue (umol/mol)&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;); lines(iwue.leaf.photo, col=&quot;#0B775E&quot;)
-ts.plot(ci.leaf/ca,ylab=&quot;ci/ca&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;); lines(ci.leaf.photo/ca, col=&quot;#0B775E&quot;)
-legend(&quot;bottomleft&quot;,c(&quot;SIMPLE&quot;, &quot;PHOTO&quot;),lwd= c(1,1), bty = &quot;n&quot;, col=c(&quot;black&quot;,&quot;#0B775E&quot;),
-       text.col=c(&quot;black&quot;,&quot;#0B775E&quot;),ncol=1)
+ts.plot(TR13,ylab=\d13C (permil.VPDB)\,xlab=\Years\, main=\OBSERVATIONS\)
+ts.plot(d13C.disc,ylab=\D13C (permil.VPDB)\,xlab=\Years\, main=\\); lines(d13C.disc.leaf, col=\#0B775E\)
+ts.plot(ca,ylab=\CO2 (ppm)\,xlab=\Years\, main=\\)
+ts.plot(ci,ylab=\ci (pa)\,xlab=\Years\, main=\FARQUHAR-MODEL\); lines(ci.leaf, col=\#0B775E\)
+ts.plot(iwue,ylab=\ iwue (umol/mol)\,xlab=\Years\, main=\\); lines(iwue.leaf, col=\#0B775E\)
+ts.plot(ci/ca,ylab=\ci/ca\,xlab=\Years\, main=\\); lines(ci.leaf/ca, col=\#0B775E\)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+Question 4: What differences do you observe between physiological indices at stem level and leaf level?
+
+
+The version of the Farquhar model we used above is a simplified description of the isotopic discrimination.
+It does not include the fractionation effects during the transfer of CO2 from substomatal cavities to the site of fixation via the mesophyll, and during mitochondrial respiration and photorespiration. While the mesophyll fractionation and their values remain highly unconstrained, recent studies have recommendedthe inclusion of the photorespiratory effect in the discrimination model as this term contributes to an increase of Δ13C with ca rise by 0.004‰ ppm-1 (Keeling et al., 2017; Lavergne et al., 2019).
+
+
+A Farquhar model that includes the photorespiratory term is as follows:
+
+Δ13C = a+(b-a)*(ci/ca) -f*(Gst/ca)
+
+The photorespiratory term is the: f*(Gst/ca)
+
+The fractionation due to photorespiration, f, is 12 permil. 
+
+Gst (or Γ*, Gamma Star) is the CO2 compensation point in the absence of mitochondrial respiration (Pa), it is calculated from the temperature (T) and atmospheric pressure response.You can use the calc_gammastar(tc, patm) function from the rpmodel to calculate Gamma Star
+
+
+
+Based on Notebook 1 and the temperature file, define the appropriate temperature window (e.g.average growing season). This has to be a Time series of site level temperature variability during the summer or growing season or relevant season for trees at this site. Below is an example for summer (June-July-August):
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZ3JpZGRlZC50dC5kYXRhIDwtIHRzKHJlYWQudGFibGUoXFxDUlVfVFQudHh0XFwsaGVhZGVyPVQpLHN0YXJ0PTE5MDEsZnJlcXVlbmN5PTEpXG50dC5KSkEgPC0gcm93TWVhbnMoZ3JpZGRlZC50dC5kYXRhWyxjKDYsNyw4KV0pXG50dC5KSkEgPC0gdHModHQuTWFyX0p1bixzdGFydD0xOTAxLGZyZXF1ZW5jeSA9MSlcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+gridded.tt.data &lt;- ts(read.table(\CRU_TT.txt\,header=T),start=1901,frequency=1)
+tt.JJA &lt;- rowMeans(gridded.tt.data[,c(6,7,8)])
+tt.JJA &lt;- ts(tt.Mar_Jun,start=1901,frequency =1)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+Calculate gamma star as follows:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxudGMgPC0gdHQuSkpBICMgYW5kIHBhdG0gaGFzIGJlZW4gZGVmaW5lZCBlYXJsaWVyLlxuR3N0IDwtIGNhbGNfZ2FtbWFzdGFyKHRjLCBwYXRtKVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+tc &lt;- tt.JJA # and patm has been defined earlier.
+Gst &lt;- calc_gammastar(tc, patm)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+And the photorespiratory term as follows:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxucGhvdG9yZXNwX3Rlcm0gPC0gMTIqKEdzdC9jYSkgIyBjYSBpcyAgaW4gUGFcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+photoresp_term &lt;- 12*(Gst/ca) # ca is  in Pa</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+Calculate ci to include photorespiration:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuY2kubGVhZi5waG90byA8LSAgY2EqKGQxM0MuZGlzYy5sZWFmLWErcGhvdG9yZXNwX3Rlcm0pLyhiLWEpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+ci.leaf.photo &lt;-  ca*(d13C.disc.leaf-a+photoresp_term)/(b-a)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+And iwue to include photorespiration:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaXd1ZS5sZWFmLnBob3RvIDwtIChjYS1jaS5sZWFmLnBob3RvKS8xLjZcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+iwue.leaf.photo &lt;- (ca-ci.leaf.photo)/1.6</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+Plot the leaf level physiological parameters using the simple and photorespiration models:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG5sYXlvdXQobWF0cml4KDE6Nixucm93ID0gMywgbmNvbCA9IDIsYnlyb3cgPSBGKSwgd2lkdGhzID0gYygzLDMsMyksaGVpZ2h0cyA9IGMoMywzLDMpLHJlc3BlY3QgPSBUUlVFKVxuIyBOb3RlIHlvdSBtaWdodCBuZWVkIHRvIGFkanVzdCB0aGUgeWxpbSB2YWx1ZXMuXG50cy5wbG90KFRSMTMseWxhYj1cXGQxM0MgKHBlcm1pbC5WUERCKVxcLHhsYWI9XFxZZWFyc1xcLCBtYWluPVxcT0JTRVJWQVRJT05TXFwpXG50cy5wbG90KGQxM0MuZGlzYy5sZWFmLHlsYWI9XFxEMTNDIChwZXJtaWwuVlBEQilcXCx4bGFiPVxcWWVhcnNcXCwgbWFpbj1cXFxcKVxudHMucGxvdChjYSx5bGFiPVxcQ08yIChwYSlcXCx4bGFiPVxcWWVhcnNcXCwgbWFpbj1cXFxcKVxudHMucGxvdChjaS5sZWFmLHlsYWI9XFxjaSAocGEpXFwseGxhYj1cXFllYXJzXFwsIG1haW49XFxGQVJRVUhBUl9NT0RFTFxcKTsgbGluZXMoY2kubGVhZi5waG90bywgY29sPVxcIzBCNzc1RVxcKVxudHMucGxvdChpd3VlLmxlYWYseWxhYj1cXCBpd3VlICh1bW9sL21vbClcXCx4bGFiPVxcWWVhcnNcXCwgbWFpbj1cXFxcKTsgbGluZXMoaXd1ZS5sZWFmLnBob3RvLCBjb2w9XFwjMEI3NzVFXFwpXG50cy5wbG90KGNpLmxlYWYvY2EseWxhYj1cXGNpL2NhXFwseGxhYj1cXFllYXJzXFwsIG1haW49XFxcXCk7IGxpbmVzKGNpLmxlYWYucGhvdG8vY2EsIGNvbD1cXCMwQjc3NUVcXClcbmxlZ2VuZChcXGJvdHRvbWxlZnRcXCxjKFxcU0lNUExFXFwsIFxcUEhPVE9cXCksbHdkPSBjKDEsMSksIGJ0eSA9IFxcblxcLCBjb2w9YyhcXGJsYWNrXFwsXFwjMEI3NzVFXFwpLFxuICAgICAgIHRleHQuY29sPWMoXFxibGFja1xcLFxcIzBCNzc1RVxcKSxuY29sPTEpXG5cbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+
+layout(matrix(1:6,nrow = 3, ncol = 2,byrow = F), widths = c(3,3,3),heights = c(3,3,3),respect = TRUE)
+# Note you might need to adjust the ylim values.
+ts.plot(TR13,ylab=\d13C (permil.VPDB)\,xlab=\Years\, main=\OBSERVATIONS\)
+ts.plot(d13C.disc.leaf,ylab=\D13C (permil.VPDB)\,xlab=\Years\, main=\\)
+ts.plot(ca,ylab=\CO2 (pa)\,xlab=\Years\, main=\\)
+ts.plot(ci.leaf,ylab=\ci (pa)\,xlab=\Years\, main=\FARQUHAR_MODEL\); lines(ci.leaf.photo, col=\#0B775E\)
+ts.plot(iwue.leaf,ylab=\ iwue (umol/mol)\,xlab=\Years\, main=\\); lines(iwue.leaf.photo, col=\#0B775E\)
+ts.plot(ci.leaf/ca,ylab=\ci/ca\,xlab=\Years\, main=\\); lines(ci.leaf.photo/ca, col=\#0B775E\)
+legend(\bottomleft\,c(\SIMPLE\, \PHOTO\),lwd= c(1,1), bty = \n\, col=c(\black\,\#0B775E\),
+       text.col=c(\black\,\#0B775E\),ncol=1)
 </code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Question 5: Do the trends and amplitude of interannual variability vary between the simple model and the one including photorespiration?</p>
-</div>
-<div id="part-4-interpreting-iwue-and-leaf-gas-exchange-strategies" class="section level2">
-<h2>PART 4: interpreting iWUE and leaf gas exchange strategies</h2>
-<p>From the parts above, you have now calculated physiological parameters using best practices to account for most fractionation factors, using the most updated source data, and scaling to leaf level.</p>
-<p>In the following, we are going to interpret variations of this physiological parameters. We will focus on those physiological parameters using the model with photorespiration.</p>
-<p>First, compute the trends of iWUE, ci and ci/ca over the period of record. you can use the lm function and the summary to look at and report the statistics (R2, p value). Here is a first example with iWUE:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaXd1ZS5saW5lYXIgPC0gbG0oaXd1ZS5sZWFmLnBob3RvIH4gc2VxKDE5MDEsMjAwMixieT0xKSlcbnN1bW1hcnkoaXd1ZS5saW5lYXIpXG5gYGAifQ== -->
-<pre class="r"><code>iwue.linear &lt;- lm(iwue.leaf.photo ~ seq(1901,2002,by=1))
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+Question 5: Do the trends and amplitude of interannual variability vary between the simple model
+and the one including photorespiration?
+
+## PART 4: interpreting iWUE and leaf gas exchange strategies 
+
+From the parts above, you have now calculated physiological parameters using best practices to account for most fractionation factors, using the most updated source data, and scaling to leaf level.
+
+In the following, we are going to interpret variations of this physiological parameters. We will focus on those physiological parameters using the model with photorespiration.
+
+First, compute the trends of iWUE, ci and ci/ca over the period of record. you can use the lm function and the summary to look at and report the statistics (R2, p value). Here is a first example with iWUE:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaXd1ZS5saW5lYXIgPC0gbG0oaXd1ZS5sZWFmLnBob3RvIH4gc2VxKDE5MDEsMjAwMixieT0xKSlcbnN1bW1hcnkoaXd1ZS5saW5lYXIpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+iwue.linear &lt;- lm(iwue.leaf.photo ~ seq(1901,2002,by=1))
 summary(iwue.linear)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Repeat these steps for ci and ci/ca:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBjaS5saW5lYXIgPC0gXG5gYGAifQ== -->
-<pre class="r"><code># ci.linear &lt;- </code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Plot time-series of iWUE, ci and ci/ca and add the linear trend. Here is a first example with iWUE. You can use the layout to have 3 plots:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGF5b3V0KG1hdHJpeCgxOjMsbnJvdyA9IDEsIG5jb2wgPSAzLGJ5cm93ID0gVCksIHdpZHRocyA9IGMoMywzLDMpLGhlaWdodHMgPSBjKDMsMywzKSxyZXNwZWN0ID0gVFJVRSlcbnRzLnBsb3QoaXd1ZS5sZWFmLnBob3RvLHlsYWI9XCIgaXd1ZSAodW1vbC9tb2wpXCIseGxhYj1cIlllYXJzXCIsIG1haW49XCJcIikgXG5hYmxpbmUoaXd1ZS5saW5lYXIsIGNvbD1cIiMwQjc3NUVcIixsd2Q9MixsdHk9MylcblxuYGBgIn0= -->
-<pre class="r"><code>layout(matrix(1:3,nrow = 1, ncol = 3,byrow = T), widths = c(3,3,3),heights = c(3,3,3),respect = TRUE)
-ts.plot(iwue.leaf.photo,ylab=&quot; iwue (umol/mol)&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;) 
-abline(iwue.linear, col=&quot;#0B775E&quot;,lwd=2,lty=3)
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+Repeat these steps for ci and ci/ca:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyBjaS5saW5lYXIgPC0gXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+# ci.linear &lt;- </code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+Plot time-series of iWUE, ci and ci/ca and add the linear trend. Here is a first example with iWUE. You can use the layout to have 3 plots:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubGF5b3V0KG1hdHJpeCgxOjMsbnJvdyA9IDEsIG5jb2wgPSAzLGJ5cm93ID0gVCksIHdpZHRocyA9IGMoMywzLDMpLGhlaWdodHMgPSBjKDMsMywzKSxyZXNwZWN0ID0gVFJVRSlcbnRzLnBsb3QoaXd1ZS5sZWFmLnBob3RvLHlsYWI9XFwgaXd1ZSAodW1vbC9tb2wpXFwseGxhYj1cXFllYXJzXFwsIG1haW49XFxcXCkgXG5hYmxpbmUoaXd1ZS5saW5lYXIsIGNvbD1cXCMwQjc3NUVcXCxsd2Q9MixsdHk9MylcblxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+layout(matrix(1:3,nrow = 1, ncol = 3,byrow = T), widths = c(3,3,3),heights = c(3,3,3),respect = TRUE)
+ts.plot(iwue.leaf.photo,ylab=\ iwue (umol/mol)\,xlab=\Years\, main=\\) 
+abline(iwue.linear, col=\#0B775E\,lwd=2,lty=3)
 </code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Question 6: Using computed statistics above, Describe the trends and their significance for each of the physiological indices.</p>
-<p>Question 7: How do you interpret the ci/ca trends in term of stomatal conductance?</p>
-<p>Question 8: Was the iWUE increase steady over time?</p>
-<p>Question 9: What was the rate of the ci (pa.year-1) increase over time?</p>
-<p>Question 10: Was this rate steady/constant over time?</p>
-<p>Question 11: compared to the rate of ca, was the rate of ci: a) proportional b) similar.To answer this question, you need to estimate the rate of ca using lm and summary functions.</p>
-<p>Estimate the ci increase relative to ca. You can do this by regressing ci by ca.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2kubGluZWFyIDwtIGxtKGNpIH4gY2EpXG5zdW1tYXJ5KGNpLmxpbmVhcilcbmBgYCJ9 -->
-<pre class="r"><code>ci.linear &lt;- lm(ci ~ ca)
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+Question 6: Using computed statistics above, Describe the trends and their significance for each of the physiological indices.
+
+Question 7: How do you interpret the ci/ca trends in term of stomatal conductance? 
+
+Question 8: Was the iWUE increase steady over time?
+
+Question 9: What was the rate of the ci (pa.year-1) increase over time? 
+
+Question 10: Was this rate steady/constant over time?
+
+Question 11: compared to the rate of ca, was the rate of ci: a) proportional   b) similar.To answer this question, you need to estimate the rate of ca using lm and summary functions.
+
+Estimate the ci increase relative to ca. You can do this by regressing ci by ca.
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuY2kubGluZWFyIDwtIGxtKGNpIH4gY2EpXG5zdW1tYXJ5KGNpLmxpbmVhcilcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+ci.linear &lt;- lm(ci ~ ca)
 summary(ci.linear)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Question 12: Report the rate and describe it in terms of a) proportional b) similar. Note that this rate translate the ci increase for each ppm/pa of ca increase.</p>
-<p>Question 13: Looking at all physiological indices, their trends and rates, how do you interpret the temporal variations of stomatal conductance and photosynthesis of these trees?</p>
-<p>With rising ca, variations in plant Δ13C have been grouped into three leaf gas-exchange strategies:</p>
-<ol style="list-style-type: decimal">
-<li>constant ci, (2) constant ci/ca, and (3) constant ca − ci.</li>
-</ol>
-<p>The first two strategies are considered active, and the third passive. These theoretical considerations serve as the basis for the interpretation of the physiological mechanisms underlying iWUE trends.</p>
-<p>Calculate ci following scenario 1:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBmaXJzdCwgZXN0aW1hdGUgdGhlIGF2ZXJhZ2UgY2kgZnJvbSB0cmVlIHJpbmcgZm9yIHRoZSBmaXJzdCBkZWNhZGUgb2YgdGhlIHJlY29yZFxuY2kuYXZlcmFnZV8xZGVjYWRlIDwtIG1lYW4oY2kubGVhZi5waG90b1sxOjEwXSlcbmNpLnNjZW5hcmlvMSA8LSB0cyhyZXAoY2kuYXZlcmFnZV8xZGVjYWRlLCAxMDIpLCBzdGFydD0xOTAxLCBmcmVxdWVuY3k9MSlcbmBgYCJ9 -->
-<pre class="r"><code># first, estimate the average ci from tree ring for the first decade of the record
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+Question 12: Report the rate and describe it in terms of a) proportional   b) similar. Note that this rate translate the ci increase for each ppm/pa of ca increase.
+
+Question 13: Looking at all physiological indices, their trends and rates, how do you interpret the temporal variations of stomatal conductance and photosynthesis of these trees?
+
+
+With rising ca, variations in plant Δ13C have been grouped into three leaf gas-exchange strategies:
+
+(1) constant ci, (2) constant ci/ca, and (3) constant ca − ci. 
+
+The first two strategies are considered active, and the third passive. These theoretical considerations serve as the basis for the interpretation of the physiological mechanisms underlying iWUE trends.
+
+Calculate ci following scenario 1:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyBmaXJzdCwgZXN0aW1hdGUgdGhlIGF2ZXJhZ2UgY2kgZnJvbSB0cmVlIHJpbmcgZm9yIHRoZSBmaXJzdCBkZWNhZGUgb2YgdGhlIHJlY29yZFxuY2kuYXZlcmFnZV8xZGVjYWRlIDwtIG1lYW4oY2kubGVhZi5waG90b1sxOjEwXSlcbmNpLnNjZW5hcmlvMSA8LSB0cyhyZXAoY2kuYXZlcmFnZV8xZGVjYWRlLCAxMDIpLCBzdGFydD0xOTAxLCBmcmVxdWVuY3k9MSlcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+# first, estimate the average ci from tree ring for the first decade of the record
 ci.average_1decade &lt;- mean(ci.leaf.photo[1:10])
 ci.scenario1 &lt;- ts(rep(ci.average_1decade, 102), start=1901, frequency=1)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Calculate ci following scenario 2:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBmaXJzdCwgZXN0aW1hdGUgdGhlIGF2ZXJhZ2UgY2kvY2EgZnJvbSB0cmVlIHJpbmcgZm9yIHRoZSBmaXJzdCBkZWNhZGUgb2YgdGhlIHJlY29yZFxuY2ljYS5hdmVyYWdlXzFkZWNhZGUgPC0gbWVhbigoY2kubGVhZi5waG90by9jYSlbMToxMF0pXG5jaS5zY2VuYXJpbzIgPC1jYSpjaWNhLmF2ZXJhZ2VfMWRlY2FkZVxuYGBgIn0= -->
-<pre class="r"><code># first, estimate the average ci/ca from tree ring for the first decade of the record
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+Calculate ci following scenario 2:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyBmaXJzdCwgZXN0aW1hdGUgdGhlIGF2ZXJhZ2UgY2kvY2EgZnJvbSB0cmVlIHJpbmcgZm9yIHRoZSBmaXJzdCBkZWNhZGUgb2YgdGhlIHJlY29yZFxuY2ljYS5hdmVyYWdlXzFkZWNhZGUgPC0gbWVhbigoY2kubGVhZi5waG90by9jYSlbMToxMF0pXG5jaS5zY2VuYXJpbzIgPC1jYSpjaWNhLmF2ZXJhZ2VfMWRlY2FkZVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+# first, estimate the average ci/ca from tree ring for the first decade of the record
 cica.average_1decade &lt;- mean((ci.leaf.photo/ca)[1:10])
 ci.scenario2 &lt;-ca*cica.average_1decade</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Calculate ci following scenario 3:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBmaXJzdCwgZXN0aW1hdGUgdGhlIGF2ZXJhZ2UgY2EtY2kgZnJvbSB0cmVlIHJpbmcgZm9yIHRoZSBmaXJzdCBkZWNhZGUgb2YgdGhlIHJlY29yZFxuY2FjaS5hdmVyYWdlXzFkZWNhZGUgPC0gbWVhbigoY2EtY2kubGVhZi5waG90bylbMToxMF0pXG5jaS5zY2VuYXJpbzMgPC1jYS1jYWNpLmF2ZXJhZ2VfMWRlY2FkZVxuXG5gYGAifQ== -->
-<pre class="r"><code># first, estimate the average ca-ci from tree ring for the first decade of the record
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+Calculate ci following scenario 3:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyBmaXJzdCwgZXN0aW1hdGUgdGhlIGF2ZXJhZ2UgY2EtY2kgZnJvbSB0cmVlIHJpbmcgZm9yIHRoZSBmaXJzdCBkZWNhZGUgb2YgdGhlIHJlY29yZFxuY2FjaS5hdmVyYWdlXzFkZWNhZGUgPC0gbWVhbigoY2EtY2kubGVhZi5waG90bylbMToxMF0pXG5jaS5zY2VuYXJpbzMgPC1jYS1jYWNpLmF2ZXJhZ2VfMWRlY2FkZVxuXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+# first, estimate the average ca-ci from tree ring for the first decade of the record
 caci.average_1decade &lt;- mean((ca-ci.leaf.photo)[1:10])
 ci.scenario3 &lt;-ca-caci.average_1decade
 </code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Plot the observed ci with the predicted ci following the 3 scenarios:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudHMucGxvdChjaS5sZWFmLnBob3RvLHlsYWI9XCJjaSAocGEpXCIseGxhYj1cIlllYXJzXCIsIG1haW49XCJcIiwgeWxpbT1jKDE1LDI1KSlcbmxpbmVzKGNpLnNjZW5hcmlvMSwgbHR5PTIsIGNvbD1cIiNGMkFEMDBcIixsd2Q9MilcbmxpbmVzKGNpLnNjZW5hcmlvMiwgbHR5PTYsIGNvbD1cIiNGMkFEMDBcIixsd2Q9MilcbmxpbmVzKGNpLnNjZW5hcmlvMywgbHR5PTMsIGNvbD1cIiNGMkFEMDBcIixsd2Q9MilcbmxlZ2VuZChcInRvcGxlZnRcIixjKFwiY2ktb2JzZXJ2ZWRcIiwgXCJjaSBjb25zdGFudFwiLFwiY2kvY2EgY29uc3RhbnRcIixcImNhLWNpIGNvbnN0YW50XCIpLFxuICAgICAgIGx0eT0gYygxLDIsNiwzKSwgbHdkPWMoMSwyLDIsMiksYnR5ID0gXCJuXCIsIGNvbD1jKFwiYmxhY2tcIixcIiNGMkFEMDBcIixcIiNGMkFEMDBcIixcIiNGMkFEMDBcIiksXG4gICAgICAgdGV4dC5jb2w9YyhcImJsYWNrXCIsXCIjRjJBRDAwXCIsXCIjRjJBRDAwXCIsXCIjRjJBRDAwXCIpLCBuY29sPTEpXG5gYGAifQ== -->
-<pre class="r"><code>ts.plot(ci.leaf.photo,ylab=&quot;ci (pa)&quot;,xlab=&quot;Years&quot;, main=&quot;&quot;, ylim=c(15,25))
-lines(ci.scenario1, lty=2, col=&quot;#F2AD00&quot;,lwd=2)
-lines(ci.scenario2, lty=6, col=&quot;#F2AD00&quot;,lwd=2)
-lines(ci.scenario3, lty=3, col=&quot;#F2AD00&quot;,lwd=2)
-legend(&quot;topleft&quot;,c(&quot;ci-observed&quot;, &quot;ci constant&quot;,&quot;ci/ca constant&quot;,&quot;ca-ci constant&quot;),
-       lty= c(1,2,6,3), lwd=c(1,2,2,2),bty = &quot;n&quot;, col=c(&quot;black&quot;,&quot;#F2AD00&quot;,&quot;#F2AD00&quot;,&quot;#F2AD00&quot;),
-       text.col=c(&quot;black&quot;,&quot;#F2AD00&quot;,&quot;#F2AD00&quot;,&quot;#F2AD00&quot;), ncol=1)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Question 14: Does the observed ci (derived from tree rings) follow any of the 3 scenarios?</p>
-<p>Question 15: Does the observed ci follow a scenario consistently throughout the record?</p>
-<p>Compute iwue following the three scenarios (using ci for 3 scenarios from above) and plot with observed iwue:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBpd3VlLnNjZW5hcmlvMSA8LSBcbmBgYCJ9 -->
-<pre class="r"><code># iwue.scenario1 &lt;- </code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+Plot the observed ci with the predicted ci following the 3 scenarios:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxudHMucGxvdChjaS5sZWFmLnBob3RvLHlsYWI9XFxjaSAocGEpXFwseGxhYj1cXFllYXJzXFwsIG1haW49XFxcXCwgeWxpbT1jKDE1LDI1KSlcbmxpbmVzKGNpLnNjZW5hcmlvMSwgbHR5PTIsIGNvbD1cXCNGMkFEMDBcXCxsd2Q9MilcbmxpbmVzKGNpLnNjZW5hcmlvMiwgbHR5PTYsIGNvbD1cXCNGMkFEMDBcXCxsd2Q9MilcbmxpbmVzKGNpLnNjZW5hcmlvMywgbHR5PTMsIGNvbD1cXCNGMkFEMDBcXCxsd2Q9MilcbmxlZ2VuZChcXHRvcGxlZnRcXCxjKFxcY2ktb2JzZXJ2ZWRcXCwgXFxjaSBjb25zdGFudFxcLFxcY2kvY2EgY29uc3RhbnRcXCxcXGNhLWNpIGNvbnN0YW50XFwpLFxuICAgICAgIGx0eT0gYygxLDIsNiwzKSwgbHdkPWMoMSwyLDIsMiksYnR5ID0gXFxuXFwsIGNvbD1jKFxcYmxhY2tcXCxcXCNGMkFEMDBcXCxcXCNGMkFEMDBcXCxcXCNGMkFEMDBcXCksXG4gICAgICAgdGV4dC5jb2w9YyhcXGJsYWNrXFwsXFwjRjJBRDAwXFwsXFwjRjJBRDAwXFwsXFwjRjJBRDAwXFwpLCBuY29sPTEpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+ts.plot(ci.leaf.photo,ylab=\ci (pa)\,xlab=\Years\, main=\\, ylim=c(15,25))
+lines(ci.scenario1, lty=2, col=\#F2AD00\,lwd=2)
+lines(ci.scenario2, lty=6, col=\#F2AD00\,lwd=2)
+lines(ci.scenario3, lty=3, col=\#F2AD00\,lwd=2)
+legend(\topleft\,c(\ci-observed\, \ci constant\,\ci/ca constant\,\ca-ci constant\),
+       lty= c(1,2,6,3), lwd=c(1,2,2,2),bty = \n\, col=c(\black\,\#F2AD00\,\#F2AD00\,\#F2AD00\),
+       text.col=c(\black\,\#F2AD00\,\#F2AD00\,\#F2AD00\), ncol=1)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+Question 14: Does the observed ci (derived from tree rings) follow any of the 3 scenarios?
+
+Question 15:   Does the observed ci follow a scenario consistently throughout the record?
+
+Compute iwue following the three scenarios (using ci for 3 scenarios from above) and plot with observed iwue:
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyBpd3VlLnNjZW5hcmlvMSA8LSBcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+# iwue.scenario1 &lt;- </code></pre>
+<p>```</p>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -634,7 +1134,7 @@ legend(&quot;topleft&quot;,c(&quot;ci-observed&quot;, &quot;ci constant&quot;,&q
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2FsY3VsYXRpb24gYW5kIGludGVycHJldGF0aW9uIG9mIHBoeXNpb2xvZ2ljYWwgaW5kaWNlcyBkZXJpdmVkIGZyb20gdHJlZSByaW5nIGQxM0MiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KClRoaXMgaXMgYW4gW1IgTWFya2Rvd25dKGh0dHA6Ly9ybWFya2Rvd24ucnN0dWRpby5jb20pIE5vdGVib29rLiBXaGVuIHlvdSBleGVjdXRlIGNvZGUgd2l0aGluIHRoZSBub3RlYm9vaywgdGhlIHJlc3VsdHMgYXBwZWFyIGJlbmVhdGggdGhlIGNvZGUuIAoKSXNvdG9wZSBEZW5kcm9jaHJvbm9sb2d5CkNhbGN1bGF0aW9uIGFuZCBpbnRlcnByZXRhdGlvbiBvZiBwaHlzaW9sb2dpY2FsIGluZGljZXMgZGVyaXZlZCBmcm9tIGQxM0MKQ09VUlNFOiBESVNDLCBMVFJSLCBVTklWRVJTSVRZIE9GIEFSSVpPTkEuIElOU1RSVUNUT1JTOiBTLiBCRUxNRUNIRVJJICYgUC4gU1pFSk5FUgoKVGhlIGZvbGxvd2luZyBjb2RlIGFuZCBjb21tZW50cyBzaG91bGQgZnVydGhlciB5b3VyIGV4cGVyaWVuY2UgdG8gdXNlIHRyZWUgcmluZyBhbmQgYXRtb3NwaGVyaWMgZDEzQyBkYXRhIHRvIGNhbGN1bGF0ZSBXVUUgYW5kIG90aGVyIHBoeXNpb2xvZ2ljYWwgaW5kaWNlcyB1c2luZyBSLiBUaGlzIGV4ZXJjaXNlIHJlbGllcyB1cG9uIHJhdyB0cmVlLXJpbmcgZDEzQyBtZWFzdXJlbWVudHMsIGF0bW9zcGhlcmljIGQxM0MgbWVhc3VyZW1lbnRzLCBhbmQgdXNlcyB0aGUgRmFycWh1YXIgMTk4MiBtb2RlbC4KClRoZXJlIGFyZSBhIGZldyBxdWVzdGlvbnMgdGhyb3VnaG91dCB0byBjYXRhbHl6ZSB1bmRlcnN0YW5kaW5nIGFuZCBjcml0aWNhbCB0aGlua2luZy4KVGhlIGFuYWx5c2lzIGlzIGJyb2tlbiBpbnRvIDQgbWFpbiBwYXJ0cyAtaW5jbHVkaW5nIDIwIHF1ZXN0aW9ucywgYXQgdGhlIGVuZCB5b3Ugc2hvdWxkIGhhdmUgZ29uZSB0aHJvdWdoIG1hbnkgb2YgdGhlIHN0ZXBzIGNvbW1vbmx5IHVzZWQgZm9yIHJlY29uc3RydWN0aW5nIGFuZCBpbnRlcnByZXRpbmcgaVdVRSBkZXJpdmVkIGZyb20gdHJlZSByaW5nIGQxM0MuIFlvdSB3aWxsIGFsc28gYmUgZmFtaWxpYXIgd2l0aCB1bmNlcnRhaW50aWVzIHJlbGF0ZWQgdG8gc3VjaCBjYWxjdWxhdGlvbnMgYW5kIGJlc3QgcHJhY3RpY2VzIHRvIHBlcmZvcm0gdGhlbS4KCiMjIFBBUlQgMDogU2V0dGluZyB1cCBkaXJlY3RvcmllcyBhbmQgZmlsZXMgCgpGb3IgdGhlIGZvbGxvd2luZyBleGVyY2lzZXMsIHlvdSB3aWxsIG5lZWQgIHRoZSBmb2xsb3dpbmcgZmlsZXMgaW4gb25lIGRpcmVjdG9yeS4KCjEuIEEgZmlsZSBjb250YWluaW5nIHRyZWUtcmluZyBkMTNDIG1lYXN1cmVtZW50cy4gVGhlIGZpbGVuYW1lIGlzICJMSUwudHh0IgoKMi4gQSBmaWxlIGNvbnRhaW5pbmcgYXRtb3NwaGVyaWMgMTNDIGRhdGEuIFRoZSBmaWxlbmFtZSBpcyAiQVRNLnR4dCIKCjMuIEEgZmlsZSBjb250YWluaW5nIHJlZ2lvbmFsIHRlbXBlcmF0dXJlIGRhdGEuIFRoZSBmaWxlbmFtZSBpcyAiQ1JVX3R0LnR4dCIKCllvdSB3aWxsIG5lZWQgdG8gY2hhbmdlIHRoZSBkaXJlY3RvcnkgaW4gUiBzbyB0aGF0IHRoaXMgaXMgdGhlIHdvcmtpbmcgZGlyZWN0b3J5LgpUaGUgY29tbWFuZCAic2V0d2QiIGlzIHVzZWQgZm9yIHRoaXMgYXMgaW4gdGhlIGZvbGxvd2luZyBsaW5lOgoKYGBge3J9CnNldHdkKCJ+L0RvY3VtZW50cy9ESVNDL05PVEVCT09LMyIpCmBgYAoKWW91IHdpbGwgYWxzbyBuZWVkIHRvIGluc3RhbGwgYW5kIGxvYWQgdGhlIGRwbFIgcGFja2FnZSwgYW5kIHRoZSBycG1vZGVsIENvcnJlY3Rpb24gUGFja2FnZToKYGBge3J9CmxpYnJhcnkoZHBsUikKbGlicmFyeShycG1vZGVsKQpgYGAKCllvdSBzaG91bGQgc2VlIHRoZSBhYm92ZSBmaWxlIG5hbWVzIChhbmQgYW55dGhpbmcgZWxzZSBpbiB0aGlzIGRpcmVjdG9yeSkgd2hlbiB5b3UgdHlwZSAob3IgY29weSBhbmQgcGFzdGUpIHRoZSBmb2xsb3dpbmcgbGluZToKYGBge3J9Cmxpc3QuZmlsZXMoKQpgYGAKCklmIHlvdSBzZWUgdGhlc2UgZmlsZXMgbGlzdGVkLCB5b3UncmUgcmVhZHkgdG8gcm9sbCEKCiMjIFBBUlQgMTogSW1wb3J0aW5nIGFuZCBwbG90dGluZyByYXcgdHJlZS1yaW5nIGlzb3RvcGUgZGF0YSBbZDEzQ10gJiBBdG1vc3BoZXJpYyBEYXRhIAoKSW1wb3J0IGFuZCBwbG90IHRoZSByYXcgdHJlZSByaW5nIGQxM0MgZGF0YXNldDoKYGBge3J9ClRSMTMgPC0gdHMoKHJlYWQudGFibGUoIkxJTC50eHQiLCBoZWFkZXI9VCkpLCBzdGFydD0xOTAxLCBmcmVxdWVuY3k9MSkKdHMucGxvdChUUjEzLnRzLHlsYWI9ImQxM0MgKHBlcm1pbC5WUERCKSIseGxhYj0iWWVhcnMiLCBjb2w9IiM5Qzk2NEEiKQpgYGAKIApJbXBvcnQgYW5kIHN1YnNldCBhdG1vc3BoZXJpYyBkYXRhOiAKYGBge3J9CkFUTSA8LSB0cygocmVhZC50YWJsZSgiQVRNLnR4dCIsIGhlYWRlcj1UKSksIHN0YXJ0PSkKIyBzdWJzZXQgZDEzQwpBVE0uMTNDIDwtIHRzKEFUTVssImF0bTEzQyJdLHN0YXJ0PTE5MDEsIGZyZXF1ZW5jeT0xKQojIHN1YnNldCBDTzIKQVRNLkNPMiA8LSB0cyhBVE1bLCJhdG1DTzIiXSxzdGFydD0xOTAxLCBmcmVxdWVuY3k9MSkKYGBgCgpQbG90IHRoZSByYXcgdHJlZSByaW5nIGQxM0MgIGFuZCB0aGUgYXRtb3NwaGVyaWMgZDEzQyBkYXRhc2V0czoKYGBge3J9CmxheW91dChtYXRyaXgoMToyLG5yb3cgPSAxLCBuY29sID0gMixieXJvdyA9IFQpLCB3aWR0aHMgPSBjKDMsMyksaGVpZ2h0cyA9IGMoMywzKSxyZXNwZWN0ID0gVFJVRSkKdHMucGxvdChBVE0uMTNDLHlsYWI9ImQxM0MgKHBlcm1pbC5WUERCKSIseGxhYj0iWWVhcnMiLCBjb2w9IiM5Qzk2NEEiLG1haW49ImQxM0MiKQp0cy5wbG90KEFUTS5DTzIseWxhYj0iQ08yIChwcG0pIix4bGFiPSJZZWFycyIsIG1haW49IkNPMiIpCgpgYGAKIApRdWVzdGlvbiAxOiBDb21wYXJlIGJvdGggdHJlbmRzLiBEZXNjcmliZSBhbmQgaW50ZXJwcmV0IHRoZSByZWxhdGlvbnNoaXAgYmV0d2VlbiB0aGUgZGVjbGluZSBpbiBkMTNDIGFuZCB0aGUgaW5jcmVhc2UgaW4gQ08yIGNvbmNlbnRyYXRpb24uIAoKIyMgUEFSVCAyOiBDYWxjdWxhdGluZyBpV1VFLSBTSU1QTEUgQVBQUk9BQ0ggCgpUaGUgRmFycXVoYXIgMTk4MiBiaW9jaGVtaWNhbCBtb2RlbCAgZGVzY3JpYmVzIHRoZSBpc290b3BpYyBkaXNjcmltaW5hdGlvbiBhZ2FpbnN0IDEzQyAozpQxM0MpIGR1cmluZyBjYXJib24gZGlmZnVzaW9uIGFuZCBmaXhhdGlvbiBieSBwbGFudHMuIFRoZSBGYXJxdWhhciBlcXVhdGlvbiBjYW4gYmUgd3JpdHRlbiBhcyBmb2xsb3dzOgoKzpQxM0MgPSBhKyhiLWEpKihjaS9jYSkKCmE9NC40IGlzIHRoZSBmcmFjdGlvbmF0aW9uIGR1ZSB0byBDTzIgZGlmZnVzaW9uIGluIGFpciB0aHJvdWdoIHRoZSBzdG9tYXRhLgoKYj0gMjggaXMgdGhlIGFwcGFyZW50IG5ldCBmcmFjdGlvbmF0aW9uIGJ5IFJ1QmlzQ08gZHVyaW5nIGNhcmJveHlsYXRpb24uCgpjaSBhbmQgY2EgYXJlIGFyZSB0aGUgbGVhZiBpbnRlcmNlbGx1bGFyIGFuZCBhbWJpZW50IHBhcnRpYWwgcHJlc3N1cmUgb2YgQ08yIChQYSksIHJlc3BlY3RpdmVseS4KCkZyb20gdGhlIGVxdWF0aW9uIGFib3ZlLCBjaSBjYW4gYmUgY2FsY3VsYXRlZCBhcyBmb2xsb3dzOgoKY2kgPSAgY2EqKM6UMTNDLWEpLyhiLWEpCgpXZSBrbm93IGNhIGZyb20gbWVhc3VyZW1lbnRzLmNhIGlzIGluIHBwbS4gWW91IHVzZSB1c2UgY2EgaW4gcG1tIHN1Y2ggYXM6CmBgYHtyfQojIFdlIGtub3cgY2EgZnJvbSBtZWFzdXJlbWVudHMuY2EgaXMgaW4gcHBtLiB5b3UgdXNlIHVzZSBpdCBhcyBpcyAKY2EgPC0gQVRNLkNPMiAjIGluIHBwbQpgYGAKT3IgdXNlIGNhIGluIFBhIGFzIGZvbGxvd3M6CmBgYHtyfQojIHlvdSBuZWVkICByIHBhY2thZ2UgInJwbW9kZWwiCmxpYnJhcnkoInJwbW9kZWwiKQpgYGAKYW5kIHRoZSBmdW5jdGlvbiBjYWxjX3BhdG0ge3JwbW9kZWx9IHRvIGNhbGN1bGF0ZSBhdG1vc3BoZXJpYyBwcmVzc3VyZSBhdCBzZWEgbGV2ZWwuIFRoZSB2YXJpYWJsZSBuZWVkZWQgaXMgZWxldmF0aW9uLgpgYGB7cn0KZWx2PSAxNjAwICMgRWxldmF0aW9uIGFib3ZlIHNlYS1sZXZlbCAobS5hLnMubC4pCnBhdG08LSBjYWxjX3BhdG0oZWx2LCBwYXRtMCA9IDEwMTMyNSkKYGBgCmNhbGN1bGF0ZSBjYSBhcyBmb2xsb3dzOgpgYGB7cn0KY2EgPC0gKCAxLmUtNiApICogY2EgKiBwYXRtICAjIGluIFBhCmBgYApjb252ZXJ0IGNhIHRvIGEgdGltZSBzZXJpZXM6CmBgYHtyfQpjYSA8LSB0cyhjYSwgc3RhcnQ9MTkwMSwgZnJlcXVlbmN5PTEpCmBgYArOlDEzQyBjYW4gdGhlbiBiZSBjYWxjdWxhdGVkIGFzIGZvbGxvd3M6CmBgYHtyfQpkMTNDLmRpc2MgPC0gKEFUTS4xM0MtVFIxMykvKDErVFIxMy8xMDAwKQpgYGAKQW5kIGNpIGFzIGZvbGxvd3M6CmBgYHtyfQpjaSA8LSAgY2EqKGQxM0MuZGlzYy1hKS8oYi1hKQpgYGAKQW5kIGl3dWUgYXMgZm9sbG93czoKYGBge3J9Cml3dWUgPC0gKGNhLWNpKS8xLjYKYGBgCnBsb3QgdGhlIHBoeXNpb2xvZ2ljYWwgaW5kaWNlczoKYGBge3J9CmxheW91dChtYXRyaXgoMTo2LG5yb3cgPSAzLCBuY29sID0gMixieXJvdyA9IEYpLCB3aWR0aHMgPSBjKDMsMywzKSxoZWlnaHRzID0gYygzLDMsMykscmVzcGVjdCA9IFRSVUUpCgp0cy5wbG90KFRSMTMseWxhYj0iZDEzQyAocGVybWlsLlZQREIpIix4bGFiPSJZZWFycyIsIG1haW49Ik9CU0VSVkFUSU9OUyIpCnRzLnBsb3QoZDEzQy5kaXNjLHlsYWI9IkQxM0MgKHBlcm1pbC5WUERCKSIseGxhYj0iWWVhcnMiLCBtYWluPSIiKQp0cy5wbG90KGNhLHlsYWI9IkNPMiAocGEpIix4bGFiPSJZZWFycyIsIG1haW49IiIpCnRzLnBsb3QoY2kseWxhYj0iY2kgKHBhKSIseGxhYj0iWWVhcnMiLCBtYWluPSJGQVJRVUhBUi1NT0RFTCIpCnRzLnBsb3QoaXd1ZSx5bGFiPSIgaXd1ZSAodW1vbC9tb2wpIix4bGFiPSJZZWFycyIsIG1haW49IiIpCnRzLnBsb3QoY2kvY2EseWxhYj0iY2kvY2EiLHhsYWI9IlllYXJzIiwgbWFpbj0iIikKCmBgYApRdWVzdGlvbiAyOiBEZXNjcmliZSB0aGUgdHJlbmRzIG9mIHRoZSB2YXJpb3VzIHBoeXNpb2xvZ2ljYWwgaW5kaWNlcy4KClF1ZXN0aW9uIDM6IEJhc2VkIG9uIHdoYXQgeW91IGhhdmUgbGVhcm5lZCBpbiB0aGUgSXNvdG9wZSB0aGVvcnkgbGVjdHVyZXMsIGRlc2NyaWJlIHRoZSB0cmVlcydwaHlzaW9sb2dpY2FsIHJlc3BvbnNlIG92ZXIgdGltZSBhdCB0aGlzIHNpdGUuCgoKIyMgUEFSVCAzOiBDYWxjdWxhdGluZyBpV1VFLSBDT01QUkVIRU5TSVZFIEFQUFJPQUNIIAoKSW4gdGhlIEZhcnF1aGFyIG1vZGVsLCB0aGUgZDEzQyBpcyB0aGUgaXNvdG9waWMgcmF0aW8gZm9yIHN1Z2FycyBmaXhlZCBpbiB0aGUgbGVhZi4gRm9yIHRyZWUtcmluZyBjZWxsdWxvc2UsIGEgY29ycmVjdGlvbiBmYWN0b3IgaXMgdXNlZCB0byBhY2NvdW50IGZvciB0aGUgb2Zmc2V0IG9mIGQxM0MgYmV0d2VlbiBsZWFmIHN1Z2FycyBhbmQgdHJlZS1yaW5nIGNlbGx1bG9zZS4gVGhlIG9mZnNldCByZXN1bHRzIGZyb20gcG9zdC1waG90b3N5bnRoZXRpYyBmcmFjdGlvbmF0aW9uIHByb2Nlc3NlcyAoR2Vzc2xlciBldCBhbC4sIDIwMTQpLiAKClRoZSBvZmZzZXQgYmV0d2VlbiB3aG9sZSB3b29kIGFuZCBsZWF2ZXMgaXMgfjEuMyDCsSAwLjLigLAgZm9yIG9hayBhbmQgY29uaWZlciBzcGVjaWVzLiBBZGRpdGlvbmFsIGlzb3RvcGljIG9mZnNldHMgaW5jbHVkZSB0aGUgZGlmZmVyZW5jZSBiZXR3ZWVuIHRyZWUtcmluZyBjZWxsdWxvc2UgYW5kIGJ1bGsgd29vZCB3aXRoIGFuIGF2ZXJhZ2UgdmFsdWUgb2YgfjEuMyDCsSAwLjLigLAsIGFuZCBpc290b3BpYyBkZXBsZXRpb24gYmV0d2VlbiBwcmltYXJ5IGFzc2ltaWxhdGVzIGFuZCBidWxrIGxlYWYgd2l0aCB2YWx1ZXMgb2YgLTAuNSDCsSAx4oCwLiAKClVwc2NhbGluZyBkMTNDIG1lYXN1cmVtZW50cyBmcm9tIHRyZWUgcmluZ3MgdG8gdGhlIGxlYWYgbGV2ZWwgY2FuIHNpZ25pZmljYW50bHkgaW1wcm92ZSBlc3RpbWF0ZXMgb2YgzpQxM0MgYW5kIGhlbmNlIHJlZHVjZSB1bmNlcnRhaW50aWVzIGluIHRoZSBkZXRlcm1pbmF0aW9uIG9mIHRoZSByYXRpbyBvZiBjaSB0byBjYS4KCldlIGNhbiBzY2FsZSB0cmVlIHJpbmcgZDEzIHRvIGxlYWYgbGV2ZWwgdXNpbmcgYSBmYWN0b3IgZC4KCmQgcmVwcmVzZW50cyB0aGUgc3VtIG9mIHBvc3QtcGhvdG9zeW50aGV0aWMgaXNvdG9wZSBmcmFjdGlvbmF0aW9ucyBiZXR3ZWVuIHRoZSBsZWFmIG9yZ2FuaWMgbWF0dGVyIGFuZCB0aGUgcGxhbnQgbWF0ZXJpYWwgY29uc2lkZXJlZC4gQ2hvb3NlIHRoZSBkIHZhbHVlIGJhc2VkIG9uIHRoZSBzdHVkaWVkIG1hdGVyaWFsICggZm9yIHRoaXMgc2l0ZSwgaXQgaXMgY2VsbHVsb3NlKQoKYGBge3J9CmQ9MS45ICMgZm9yIGQxM0MgbWVhc3VyZWQgaW4gd29vZApkPTIuMSAjIGZvciBkMTNDIG1lYXN1cmVkIGluIGNlbGx1bG9zZQpgYGAKClRoaXMgY29ycmVjdGlvbiBjYW4gYmUgbWFkZSBhcyBmb2xsb3dzOgpgYGB7cn0KZDEzQy5kaXNjLmxlYWYgPC0gKEFUTS4xM0MtKFRSMTMtZCkpLygxKyhUUjEzLWQpLzEwMDApCmBgYAoKTGVhZiBsZXZlbCBjaSBjYW4gYmUgY2FsY3VsYXRlZCBhcyBmb2xsb3dzOgpgYGB7cn0KY2kubGVhZiA8LSAgY2EqKGQxM0MuZGlzYy5sZWFmLWEpLyhiLWEpCmBgYAoKTGVhZiBsZXZlbCBpd3VlIGNhbiBiZSBjYWxjdWxhdGVkIGFzIGZvbGxvd3M6CmBgYHtyfQppd3VlLmxlYWYgPC0gKGNhLWNpLmxlYWYpLzEuNgpgYGAKbm93IGFkZCB0aGUgbGVhZiBsZXZlbCBwaHlzaW9sb2dpY2FsIGluZGljZXMgdG8gdGhlIHByZXZpb3VzIHBsb3Q6CmBgYHtyfQpsYXlvdXQobWF0cml4KDE6Nixucm93ID0gMywgbmNvbCA9IDIsYnlyb3cgPSBGKSwgd2lkdGhzID0gYygzLDMsMyksaGVpZ2h0cyA9IGMoMywzLDMpLHJlc3BlY3QgPSBUUlVFKQojIE5vdGUgeW91IG1pZ2h0IG5lZWQgdG8gYWRqdXN0IHRoZSB5bGltIHZhbHVlcy4KdHMucGxvdChUUjEzLHlsYWI9ImQxM0MgKHBlcm1pbC5WUERCKSIseGxhYj0iWWVhcnMiLCBtYWluPSJPQlNFUlZBVElPTlMiKQp0cy5wbG90KGQxM0MuZGlzYyx5bGFiPSJEMTNDIChwZXJtaWwuVlBEQikiLHhsYWI9IlllYXJzIiwgbWFpbj0iIik7IGxpbmVzKGQxM0MuZGlzYy5sZWFmLCBjb2w9IiMwQjc3NUUiKQp0cy5wbG90KGNhLHlsYWI9IkNPMiAocHBtKSIseGxhYj0iWWVhcnMiLCBtYWluPSIiKQp0cy5wbG90KGNpLHlsYWI9ImNpIChwYSkiLHhsYWI9IlllYXJzIiwgbWFpbj0iRkFSUVVIQVItTU9ERUwiKTsgbGluZXMoY2kubGVhZiwgY29sPSIjMEI3NzVFIikKdHMucGxvdChpd3VlLHlsYWI9IiBpd3VlICh1bW9sL21vbCkiLHhsYWI9IlllYXJzIiwgbWFpbj0iIik7IGxpbmVzKGl3dWUubGVhZiwgY29sPSIjMEI3NzVFIikKdHMucGxvdChjaS9jYSx5bGFiPSJjaS9jYSIseGxhYj0iWWVhcnMiLCBtYWluPSIiKTsgbGluZXMoY2kubGVhZi9jYSwgY29sPSIjMEI3NzVFIikKYGBgClF1ZXN0aW9uIDQ6IFdoYXQgZGlmZmVyZW5jZXMgZG8geW91IG9ic2VydmUgYmV0d2VlbiBwaHlzaW9sb2dpY2FsIGluZGljZXMgYXQgc3RlbSBsZXZlbCBhbmQgbGVhZiBsZXZlbD8KCgpUaGUgdmVyc2lvbiBvZiB0aGUgRmFycXVoYXIgbW9kZWwgd2UgdXNlZCBhYm92ZSBpcyBhIHNpbXBsaWZpZWQgZGVzY3JpcHRpb24gb2YgdGhlIGlzb3RvcGljIGRpc2NyaW1pbmF0aW9uLgpJdCBkb2VzIG5vdCBpbmNsdWRlIHRoZSBmcmFjdGlvbmF0aW9uIGVmZmVjdHMgZHVyaW5nIHRoZSB0cmFuc2ZlciBvZiBDTzIgZnJvbSBzdWJzdG9tYXRhbCBjYXZpdGllcyB0byB0aGUgc2l0ZSBvZiBmaXhhdGlvbiB2aWEgdGhlIG1lc29waHlsbCwgYW5kIGR1cmluZyBtaXRvY2hvbmRyaWFsIHJlc3BpcmF0aW9uIGFuZCBwaG90b3Jlc3BpcmF0aW9uLiBXaGlsZSB0aGUgbWVzb3BoeWxsIGZyYWN0aW9uYXRpb24gYW5kIHRoZWlyIHZhbHVlcyByZW1haW4gaGlnaGx5IHVuY29uc3RyYWluZWQsIHJlY2VudCBzdHVkaWVzIGhhdmUgcmVjb21tZW5kZWR0aGUgaW5jbHVzaW9uIG9mIHRoZSBwaG90b3Jlc3BpcmF0b3J5IGVmZmVjdCBpbiB0aGUgZGlzY3JpbWluYXRpb24gbW9kZWwgYXMgdGhpcyB0ZXJtIGNvbnRyaWJ1dGVzIHRvIGFuIGluY3JlYXNlIG9mIM6UMTNDIHdpdGggY2EgcmlzZSBieSAwLjAwNOKAsCBwcG0tMSAoS2VlbGluZyBldCBhbC4sIDIwMTc7IExhdmVyZ25lIGV0IGFsLiwgMjAxOSkuCgoKQSBGYXJxdWhhciBtb2RlbCB0aGF0IGluY2x1ZGVzIHRoZSBwaG90b3Jlc3BpcmF0b3J5IHRlcm0gaXMgYXMgZm9sbG93czoKCs6UMTNDID0gYSsoYi1hKSooY2kvY2EpIC1mKihHc3QvY2EpCgpUaGUgcGhvdG9yZXNwaXJhdG9yeSB0ZXJtIGlzIHRoZTogZiooR3N0L2NhKQoKVGhlIGZyYWN0aW9uYXRpb24gZHVlIHRvIHBob3RvcmVzcGlyYXRpb24sIGYsIGlzIDEyIHBlcm1pbC4gCgpHc3QgKG9yIM6TKiwgR2FtbWEgU3RhcikgaXMgdGhlIENPMiBjb21wZW5zYXRpb24gcG9pbnQgaW4gdGhlIGFic2VuY2Ugb2YgbWl0b2Nob25kcmlhbCByZXNwaXJhdGlvbiAoUGEpLCBpdCBpcyBjYWxjdWxhdGVkIGZyb20gdGhlIHRlbXBlcmF0dXJlIChUKSBhbmQgYXRtb3NwaGVyaWMgcHJlc3N1cmUgcmVzcG9uc2UuWW91IGNhbiB1c2UgdGhlIGNhbGNfZ2FtbWFzdGFyKHRjLCBwYXRtKSBmdW5jdGlvbiBmcm9tIHRoZSBycG1vZGVsIHRvIGNhbGN1bGF0ZSBHYW1tYSBTdGFyCgoKCkJhc2VkIG9uIE5vdGVib29rIDEgYW5kIHRoZSB0ZW1wZXJhdHVyZSBmaWxlLCBkZWZpbmUgdGhlIGFwcHJvcHJpYXRlIHRlbXBlcmF0dXJlIHdpbmRvdyAoZS5nLmF2ZXJhZ2UgZ3Jvd2luZyBzZWFzb24pLiBUaGlzIGhhcyB0byBiZSBhIFRpbWUgc2VyaWVzIG9mIHNpdGUgbGV2ZWwgdGVtcGVyYXR1cmUgdmFyaWFiaWxpdHkgZHVyaW5nIHRoZSBzdW1tZXIgb3IgZ3Jvd2luZyBzZWFzb24gb3IgcmVsZXZhbnQgc2Vhc29uIGZvciB0cmVlcyBhdCB0aGlzIHNpdGUuIEJlbG93IGlzIGFuIGV4YW1wbGUgZm9yIHN1bW1lciAoSnVuZS1KdWx5LUF1Z3VzdCk6CmBgYHtyfQpncmlkZGVkLnR0LmRhdGEgPC0gdHMocmVhZC50YWJsZSgiQ1JVX1RULnR4dCIsaGVhZGVyPVQpLHN0YXJ0PTE5MDEsZnJlcXVlbmN5PTEpCnR0LkpKQSA8LSByb3dNZWFucyhncmlkZGVkLnR0LmRhdGFbLGMoNiw3LDgpXSkKdHQuSkpBIDwtIHRzKHR0Lk1hcl9KdW4sc3RhcnQ9MTkwMSxmcmVxdWVuY3kgPTEpCmBgYAoKQ2FsY3VsYXRlIGdhbW1hIHN0YXIgYXMgZm9sbG93czoKYGBge3J9CnRjIDwtIHR0LkpKQSAjIGFuZCBwYXRtIGhhcyBiZWVuIGRlZmluZWQgZWFybGllci4KR3N0IDwtIGNhbGNfZ2FtbWFzdGFyKHRjLCBwYXRtKQpgYGAKCkFuZCB0aGUgcGhvdG9yZXNwaXJhdG9yeSB0ZXJtIGFzIGZvbGxvd3M6CmBgYHtyfQpwaG90b3Jlc3BfdGVybSA8LSAxMiooR3N0L2NhKSAjIGNhIGlzICBpbiBQYQpgYGAKQ2FsY3VsYXRlIGNpIHRvIGluY2x1ZGUgcGhvdG9yZXNwaXJhdGlvbjoKYGBge3J9CmNpLmxlYWYucGhvdG8gPC0gIGNhKihkMTNDLmRpc2MubGVhZi1hK3Bob3RvcmVzcF90ZXJtKS8oYi1hKQpgYGAKQW5kIGl3dWUgdG8gaW5jbHVkZSBwaG90b3Jlc3BpcmF0aW9uOgpgYGB7cn0KaXd1ZS5sZWFmLnBob3RvIDwtIChjYS1jaS5sZWFmLnBob3RvKS8xLjYKYGBgCgpQbG90IHRoZSBsZWFmIGxldmVsIHBoeXNpb2xvZ2ljYWwgcGFyYW1ldGVycyB1c2luZyB0aGUgc2ltcGxlIGFuZCBwaG90b3Jlc3BpcmF0aW9uIG1vZGVsczoKYGBge3J9CgpsYXlvdXQobWF0cml4KDE6Nixucm93ID0gMywgbmNvbCA9IDIsYnlyb3cgPSBGKSwgd2lkdGhzID0gYygzLDMsMyksaGVpZ2h0cyA9IGMoMywzLDMpLHJlc3BlY3QgPSBUUlVFKQojIE5vdGUgeW91IG1pZ2h0IG5lZWQgdG8gYWRqdXN0IHRoZSB5bGltIHZhbHVlcy4KdHMucGxvdChUUjEzLHlsYWI9ImQxM0MgKHBlcm1pbC5WUERCKSIseGxhYj0iWWVhcnMiLCBtYWluPSJPQlNFUlZBVElPTlMiKQp0cy5wbG90KGQxM0MuZGlzYy5sZWFmLHlsYWI9IkQxM0MgKHBlcm1pbC5WUERCKSIseGxhYj0iWWVhcnMiLCBtYWluPSIiKQp0cy5wbG90KGNhLHlsYWI9IkNPMiAocGEpIix4bGFiPSJZZWFycyIsIG1haW49IiIpCnRzLnBsb3QoY2kubGVhZix5bGFiPSJjaSAocGEpIix4bGFiPSJZZWFycyIsIG1haW49IkZBUlFVSEFSX01PREVMIik7IGxpbmVzKGNpLmxlYWYucGhvdG8sIGNvbD0iIzBCNzc1RSIpCnRzLnBsb3QoaXd1ZS5sZWFmLHlsYWI9IiBpd3VlICh1bW9sL21vbCkiLHhsYWI9IlllYXJzIiwgbWFpbj0iIik7IGxpbmVzKGl3dWUubGVhZi5waG90bywgY29sPSIjMEI3NzVFIikKdHMucGxvdChjaS5sZWFmL2NhLHlsYWI9ImNpL2NhIix4bGFiPSJZZWFycyIsIG1haW49IiIpOyBsaW5lcyhjaS5sZWFmLnBob3RvL2NhLCBjb2w9IiMwQjc3NUUiKQpsZWdlbmQoImJvdHRvbWxlZnQiLGMoIlNJTVBMRSIsICJQSE9UTyIpLGx3ZD0gYygxLDEpLCBidHkgPSAibiIsIGNvbD1jKCJibGFjayIsIiMwQjc3NUUiKSwKICAgICAgIHRleHQuY29sPWMoImJsYWNrIiwiIzBCNzc1RSIpLG5jb2w9MSkKCmBgYAoKUXVlc3Rpb24gNTogRG8gdGhlIHRyZW5kcyBhbmQgYW1wbGl0dWRlIG9mIGludGVyYW5udWFsIHZhcmlhYmlsaXR5IHZhcnkgYmV0d2VlbiB0aGUgc2ltcGxlIG1vZGVsCmFuZCB0aGUgb25lIGluY2x1ZGluZyBwaG90b3Jlc3BpcmF0aW9uPwoKIyMgUEFSVCA0OiBpbnRlcnByZXRpbmcgaVdVRSBhbmQgbGVhZiBnYXMgZXhjaGFuZ2Ugc3RyYXRlZ2llcyAKCkZyb20gdGhlIHBhcnRzIGFib3ZlLCB5b3UgaGF2ZSBub3cgY2FsY3VsYXRlZCBwaHlzaW9sb2dpY2FsIHBhcmFtZXRlcnMgdXNpbmcgYmVzdCBwcmFjdGljZXMgdG8gYWNjb3VudCBmb3IgbW9zdCBmcmFjdGlvbmF0aW9uIGZhY3RvcnMsIHVzaW5nIHRoZSBtb3N0IHVwZGF0ZWQgc291cmNlIGRhdGEsIGFuZCBzY2FsaW5nIHRvIGxlYWYgbGV2ZWwuCgpJbiB0aGUgZm9sbG93aW5nLCB3ZSBhcmUgZ29pbmcgdG8gaW50ZXJwcmV0IHZhcmlhdGlvbnMgb2YgdGhpcyBwaHlzaW9sb2dpY2FsIHBhcmFtZXRlcnMuIFdlIHdpbGwgZm9jdXMgb24gdGhvc2UgcGh5c2lvbG9naWNhbCBwYXJhbWV0ZXJzIHVzaW5nIHRoZSBtb2RlbCB3aXRoIHBob3RvcmVzcGlyYXRpb24uCgpGaXJzdCwgY29tcHV0ZSB0aGUgdHJlbmRzIG9mIGlXVUUsIGNpIGFuZCBjaS9jYSBvdmVyIHRoZSBwZXJpb2Qgb2YgcmVjb3JkLiB5b3UgY2FuIHVzZSB0aGUgbG0gZnVuY3Rpb24gYW5kIHRoZSBzdW1tYXJ5IHRvIGxvb2sgYXQgYW5kIHJlcG9ydCB0aGUgc3RhdGlzdGljcyAoUjIsIHAgdmFsdWUpLiBIZXJlIGlzIGEgZmlyc3QgZXhhbXBsZSB3aXRoIGlXVUU6CmBgYHtyfQppd3VlLmxpbmVhciA8LSBsbShpd3VlLmxlYWYucGhvdG8gfiBzZXEoMTkwMSwyMDAyLGJ5PTEpKQpzdW1tYXJ5KGl3dWUubGluZWFyKQpgYGAKUmVwZWF0IHRoZXNlIHN0ZXBzIGZvciBjaSBhbmQgY2kvY2E6CmBgYHtyfQojIGNpLmxpbmVhciA8LSAKYGBgClBsb3QgdGltZS1zZXJpZXMgb2YgaVdVRSwgY2kgYW5kIGNpL2NhIGFuZCBhZGQgdGhlIGxpbmVhciB0cmVuZC4gSGVyZSBpcyBhIGZpcnN0IGV4YW1wbGUgd2l0aCBpV1VFLiBZb3UgY2FuIHVzZSB0aGUgbGF5b3V0IHRvIGhhdmUgMyBwbG90czoKYGBge3J9CmxheW91dChtYXRyaXgoMTozLG5yb3cgPSAxLCBuY29sID0gMyxieXJvdyA9IFQpLCB3aWR0aHMgPSBjKDMsMywzKSxoZWlnaHRzID0gYygzLDMsMykscmVzcGVjdCA9IFRSVUUpCnRzLnBsb3QoaXd1ZS5sZWFmLnBob3RvLHlsYWI9IiBpd3VlICh1bW9sL21vbCkiLHhsYWI9IlllYXJzIiwgbWFpbj0iIikgCmFibGluZShpd3VlLmxpbmVhciwgY29sPSIjMEI3NzVFIixsd2Q9MixsdHk9MykKCmBgYAoKUXVlc3Rpb24gNjogVXNpbmcgY29tcHV0ZWQgc3RhdGlzdGljcyBhYm92ZSwgRGVzY3JpYmUgdGhlIHRyZW5kcyBhbmQgdGhlaXIgc2lnbmlmaWNhbmNlIGZvciBlYWNoIG9mIHRoZSBwaHlzaW9sb2dpY2FsIGluZGljZXMuCgpRdWVzdGlvbiA3OiBIb3cgZG8geW91IGludGVycHJldCB0aGUgY2kvY2EgdHJlbmRzIGluIHRlcm0gb2Ygc3RvbWF0YWwgY29uZHVjdGFuY2U/IAoKUXVlc3Rpb24gODogV2FzIHRoZSBpV1VFIGluY3JlYXNlIHN0ZWFkeSBvdmVyIHRpbWU/CgpRdWVzdGlvbiA5OiBXaGF0IHdhcyB0aGUgcmF0ZSBvZiB0aGUgY2kgKHBhLnllYXItMSkgaW5jcmVhc2Ugb3ZlciB0aW1lPyAKClF1ZXN0aW9uIDEwOiBXYXMgdGhpcyByYXRlIHN0ZWFkeS9jb25zdGFudCBvdmVyIHRpbWU/CgpRdWVzdGlvbiAxMTogY29tcGFyZWQgdG8gdGhlIHJhdGUgb2YgY2EsIHdhcyB0aGUgcmF0ZSBvZiBjaTogYSkgcHJvcG9ydGlvbmFsICAgYikgc2ltaWxhci5UbyBhbnN3ZXIgdGhpcyBxdWVzdGlvbiwgeW91IG5lZWQgdG8gZXN0aW1hdGUgdGhlIHJhdGUgb2YgY2EgdXNpbmcgbG0gYW5kIHN1bW1hcnkgZnVuY3Rpb25zLgoKRXN0aW1hdGUgdGhlIGNpIGluY3JlYXNlIHJlbGF0aXZlIHRvIGNhLiBZb3UgY2FuIGRvIHRoaXMgYnkgcmVncmVzc2luZyBjaSBieSBjYS4KYGBge3J9CmNpLmxpbmVhciA8LSBsbShjaSB+IGNhKQpzdW1tYXJ5KGNpLmxpbmVhcikKYGBgCgpRdWVzdGlvbiAxMjogUmVwb3J0IHRoZSByYXRlIGFuZCBkZXNjcmliZSBpdCBpbiB0ZXJtcyBvZiBhKSBwcm9wb3J0aW9uYWwgICBiKSBzaW1pbGFyLiBOb3RlIHRoYXQgdGhpcyByYXRlIHRyYW5zbGF0ZSB0aGUgY2kgaW5jcmVhc2UgZm9yIGVhY2ggcHBtL3BhIG9mIGNhIGluY3JlYXNlLgoKUXVlc3Rpb24gMTM6IExvb2tpbmcgYXQgYWxsIHBoeXNpb2xvZ2ljYWwgaW5kaWNlcywgdGhlaXIgdHJlbmRzIGFuZCByYXRlcywgaG93IGRvIHlvdSBpbnRlcnByZXQgdGhlIHRlbXBvcmFsIHZhcmlhdGlvbnMgb2Ygc3RvbWF0YWwgY29uZHVjdGFuY2UgYW5kIHBob3Rvc3ludGhlc2lzIG9mIHRoZXNlIHRyZWVzPwoKCldpdGggcmlzaW5nIGNhLCB2YXJpYXRpb25zIGluIHBsYW50IM6UMTNDIGhhdmUgYmVlbiBncm91cGVkIGludG8gdGhyZWUgbGVhZiBnYXMtZXhjaGFuZ2Ugc3RyYXRlZ2llczoKCigxKSBjb25zdGFudCBjaSwgKDIpIGNvbnN0YW50IGNpL2NhLCBhbmQgKDMpIGNvbnN0YW50IGNhIOKIkiBjaS4gCgpUaGUgZmlyc3QgdHdvIHN0cmF0ZWdpZXMgYXJlIGNvbnNpZGVyZWQgYWN0aXZlLCBhbmQgdGhlIHRoaXJkIHBhc3NpdmUuIFRoZXNlIHRoZW9yZXRpY2FsIGNvbnNpZGVyYXRpb25zIHNlcnZlIGFzIHRoZSBiYXNpcyBmb3IgdGhlIGludGVycHJldGF0aW9uIG9mIHRoZSBwaHlzaW9sb2dpY2FsIG1lY2hhbmlzbXMgdW5kZXJseWluZyBpV1VFIHRyZW5kcy4KCkNhbGN1bGF0ZSBjaSBmb2xsb3dpbmcgc2NlbmFyaW8gMToKYGBge3J9CiMgZmlyc3QsIGVzdGltYXRlIHRoZSBhdmVyYWdlIGNpIGZyb20gdHJlZSByaW5nIGZvciB0aGUgZmlyc3QgZGVjYWRlIG9mIHRoZSByZWNvcmQKY2kuYXZlcmFnZV8xZGVjYWRlIDwtIG1lYW4oY2kubGVhZi5waG90b1sxOjEwXSkKY2kuc2NlbmFyaW8xIDwtIHRzKHJlcChjaS5hdmVyYWdlXzFkZWNhZGUsIDEwMiksIHN0YXJ0PTE5MDEsIGZyZXF1ZW5jeT0xKQpgYGAKQ2FsY3VsYXRlIGNpIGZvbGxvd2luZyBzY2VuYXJpbyAyOgpgYGB7cn0KIyBmaXJzdCwgZXN0aW1hdGUgdGhlIGF2ZXJhZ2UgY2kvY2EgZnJvbSB0cmVlIHJpbmcgZm9yIHRoZSBmaXJzdCBkZWNhZGUgb2YgdGhlIHJlY29yZApjaWNhLmF2ZXJhZ2VfMWRlY2FkZSA8LSBtZWFuKChjaS5sZWFmLnBob3RvL2NhKVsxOjEwXSkKY2kuc2NlbmFyaW8yIDwtY2EqY2ljYS5hdmVyYWdlXzFkZWNhZGUKYGBgCkNhbGN1bGF0ZSBjaSBmb2xsb3dpbmcgc2NlbmFyaW8gMzoKYGBge3J9CiMgZmlyc3QsIGVzdGltYXRlIHRoZSBhdmVyYWdlIGNhLWNpIGZyb20gdHJlZSByaW5nIGZvciB0aGUgZmlyc3QgZGVjYWRlIG9mIHRoZSByZWNvcmQKY2FjaS5hdmVyYWdlXzFkZWNhZGUgPC0gbWVhbigoY2EtY2kubGVhZi5waG90bylbMToxMF0pCmNpLnNjZW5hcmlvMyA8LWNhLWNhY2kuYXZlcmFnZV8xZGVjYWRlCgpgYGAKUGxvdCB0aGUgb2JzZXJ2ZWQgY2kgd2l0aCB0aGUgcHJlZGljdGVkIGNpIGZvbGxvd2luZyB0aGUgMyBzY2VuYXJpb3M6CmBgYHtyfQp0cy5wbG90KGNpLmxlYWYucGhvdG8seWxhYj0iY2kgKHBhKSIseGxhYj0iWWVhcnMiLCBtYWluPSIiLCB5bGltPWMoMTUsMjUpKQpsaW5lcyhjaS5zY2VuYXJpbzEsIGx0eT0yLCBjb2w9IiNGMkFEMDAiLGx3ZD0yKQpsaW5lcyhjaS5zY2VuYXJpbzIsIGx0eT02LCBjb2w9IiNGMkFEMDAiLGx3ZD0yKQpsaW5lcyhjaS5zY2VuYXJpbzMsIGx0eT0zLCBjb2w9IiNGMkFEMDAiLGx3ZD0yKQpsZWdlbmQoInRvcGxlZnQiLGMoImNpLW9ic2VydmVkIiwgImNpIGNvbnN0YW50IiwiY2kvY2EgY29uc3RhbnQiLCJjYS1jaSBjb25zdGFudCIpLAogICAgICAgbHR5PSBjKDEsMiw2LDMpLCBsd2Q9YygxLDIsMiwyKSxidHkgPSAibiIsIGNvbD1jKCJibGFjayIsIiNGMkFEMDAiLCIjRjJBRDAwIiwiI0YyQUQwMCIpLAogICAgICAgdGV4dC5jb2w9YygiYmxhY2siLCIjRjJBRDAwIiwiI0YyQUQwMCIsIiNGMkFEMDAiKSwgbmNvbD0xKQpgYGAKClF1ZXN0aW9uIDE0OiBEb2VzIHRoZSBvYnNlcnZlZCBjaSAoZGVyaXZlZCBmcm9tIHRyZWUgcmluZ3MpIGZvbGxvdyBhbnkgb2YgdGhlIDMgc2NlbmFyaW9zPwoKUXVlc3Rpb24gMTU6ICAgRG9lcyB0aGUgb2JzZXJ2ZWQgY2kgZm9sbG93IGEgc2NlbmFyaW8gY29uc2lzdGVudGx5IHRocm91Z2hvdXQgdGhlIHJlY29yZD8KCkNvbXB1dGUgaXd1ZSBmb2xsb3dpbmcgdGhlIHRocmVlIHNjZW5hcmlvcyAodXNpbmcgY2kgZm9yIDMgc2NlbmFyaW9zIGZyb20gYWJvdmUpIGFuZCBwbG90IHdpdGggb2JzZXJ2ZWQgaXd1ZToKYGBge3J9CiMgaXd1ZS5zY2VuYXJpbzEgPC0gCmBgYAoKIyMgRGlzY3Vzc2lvbiAKCkZyb20gTm90ZWJvb2sgMSwgeW91IGFzc2Vzc2VkIGNsaW1hdGUgY29ycmVsYXRpb25zIGJldHdlZW4gMTNDIGFuZCBjbGltYXRlIHZhcmlhYmxlcy4gQmFzZWQgb24gdGhlIGNsaW1hdGUgdHJlbmRzIGFuZCB0cmVlIHJpbmcgZDEzQyBzZW5zaXRpdml0eSB0byB0aGVzZSBjbGltYXRlIGZhY3RvcnMvdHJlbmRzLCBhbnN3ZXIgdGhlIGZvbGxvd2luZzoKClF1ZXN0aW9uIDE2OiBIb3cgZG8geW91IGludGVycHJldCB0aGUgY2hhbmdlIChpbmNyZWFzZSkgaW4gaXd1ZT8KClF1ZXN0aW9uIDE3OiBpcyBpdCBkcml2ZW4gYnkgYW4gaW5jcmVhc2UgaXMgcGhvdG9zeW50aGV0aWMgYXNzaW1pbGF0aW9uPwoKUXVlc3Rpb24gMTg6IGlzIGl0IGRyaXZlbiBieSBhIGRlY3JlYXNlIGlzIHN0b21hdGFsIGNvbmR1Y3RhbmNlPwoKUXVlc3Rpb24gMTk6IGFyZSBpd3VlLCBwaG90b3N5bnRoZXRpYyBhc3NpbWlsYXRpb24sc3RvbWF0YWwgY29uZHVjdGFuY2UgZHJpdmVuIGJ5CgogYSkgcmlzaW5nIGNhLCBiKSB0cmVuZHMgaW4gY2xpbWF0ZSwgYykgYm90aD8KIApRdWVzdGlvbiAyMDogZGlzY3VzcyBob3cgdHJlbmRzIGluIGNhIGFuZC9vciBjbGltYXRlIGFyZSBhZmZlY3RpbmcgdHJlZSBwaHlzaW9sb2d5Cg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2FsY3VsYXRpb24gYW5kIGludGVycHJldGF0aW9uIG9mIHBoeXNpb2xvZ2ljYWwgaW5kaWNlcyBkZXJpdmVkIGZyb20gdHJlZSByaW5nIGQxM0MiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCgpJc290b3BlIERlbmRyb2Nocm9ub2xvZ3kKQ2FsY3VsYXRpb24gYW5kIGludGVycHJldGF0aW9uIG9mIHBoeXNpb2xvZ2ljYWwgaW5kaWNlcyBkZXJpdmVkIGZyb20gZDEzQwpDT1VSU0U6IERJU0MsIExUUlIsIFVOSVZFUlNJVFkgT0YgQVJJWk9OQS4gSU5TVFJVQ1RPUlM6IFMuIEJFTE1FQ0hFUkkgJiBQLiBTWkVKTkVSCgpUaGUgZm9sbG93aW5nIGNvZGUgYW5kIGNvbW1lbnRzIHNob3VsZCBmdXJ0aGVyIHlvdXIgZXhwZXJpZW5jZSB1c2luZyB0cmVlIHJpbmcgYW5kIGF0bW9zcGhlcmljIGQxM0MgZGF0YSB0byBjYWxjdWxhdGUgV1VFIGFuZCBvdGhlciBwaHlzaW9sb2dpY2FsIGluZGljZXMuIFRoaXMgZXhlcmNpc2UgcmVsaWVzIHVwb24gcmF3IHRyZWUtcmluZyBkMTNDIG1lYXN1cmVtZW50cywgYXRtb3NwaGVyaWMgZDEzQyBtZWFzdXJlbWVudHMsIGFuZCB1c2VzIHRoZSBGYXJxaHVhciAxOTgyIG1vZGVsLgoKVGhlcmUgYXJlIGEgZmV3IHF1ZXN0aW9ucyB0aHJvdWdob3V0IHRvIGNhdGFseXplIHVuZGVyc3RhbmRpbmcgYW5kIGNyaXRpY2FsIHRoaW5raW5nLiBUaGUgYW5hbHlzaXMgaXMgYnJva2VuIGludG8gNCBtYWluIHBhcnRzIC1pbmNsdWRpbmcgMjAgcXVlc3Rpb25zLCBhdCB0aGUgZW5kIHlvdSBzaG91bGQgaGF2ZSBnb25lIHRocm91Z2ggbWFueSBvZiB0aGUgc3RlcHMgY29tbW9ubHkgdXNlZCBmb3IgcmVjb25zdHJ1Y3RpbmcgYW5kIGludGVycHJldGluZyBpV1VFIGRlcml2ZWQgZnJvbSB0cmVlIHJpbmcgZDEzQy4gWW91IHdpbGwgYWxzbyBiZSBmYW1pbGlhciB3aXRoIHVuY2VydGFpbnRpZXMgcmVsYXRlZCB0byBzdWNoIGNhbGN1bGF0aW9ucyBhbmQgYmVzdCBwcmFjdGljZXMgdG8gcGVyZm9ybSB0aGVtLgoKIyMgUEFSVCAwOiBTZXR0aW5nIHVwIGRpcmVjdG9yaWVzIGFuZCBmaWxlcyAKCkZvciB0aGUgZm9sbG93aW5nIGV4ZXJjaXNlcywgeW91IHdpbGwgbmVlZCAgdGhlIGZvbGxvd2luZyBmaWxlcyBpbiBvbmUgZGlyZWN0b3J5LgoKMS4gQSBmaWxlIGNvbnRhaW5pbmcgdHJlZS1yaW5nIGQxM0MgbWVhc3VyZW1lbnRzLiBUaGUgZmlsZW5hbWUgaXMgIkxJTC50eHQiCgoyLiBBIGZpbGUgY29udGFpbmluZyBhdG1vc3BoZXJpYyAxM0MgZGF0YS4gVGhlIGZpbGVuYW1lIGlzICJBVE0udHh0IgoKMy4gQSBmaWxlIGNvbnRhaW5pbmcgcmVnaW9uYWwgdGVtcGVyYXR1cmUgZGF0YS4gVGhlIGZpbGVuYW1lIGlzICJDUlVfdHQudHh0IgoKWW91IHdpbGwgbmVlZCB0byBjaGFuZ2UgdGhlIGRpcmVjdG9yeSBpbiBSIHNvIHRoYXQgdGhpcyBpcyB0aGUgd29ya2luZyBkaXJlY3RvcnkuClRoZSBjb21tYW5kICJzZXR3ZCIgaXMgdXNlZCBmb3IgdGhpcyBhcyBpbiB0aGUgZm9sbG93aW5nIGxpbmU6CgpgYGB7cn0Kc2V0d2QoIn4vRG9jdW1lbnRzL0RJU0MvTk9URUJPT0szIikKYGBgCgpZb3Ugd2lsbCBhbHNvIG5lZWQgdG8gaW5zdGFsbCBhbmQgbG9hZCB0aGUgZHBsUiBwYWNrYWdlLCBhbmQgdGhlIHJwbW9kZWwgQ29ycmVjdGlvbiBQYWNrYWdlOgpgYGB7cn0KbGlicmFyeShkcGxSKQpsaWJyYXJ5KHJwbW9kZWwpCmBgYAoKWW91IHNob3VsZCBzZWUgdGhlIGFib3ZlIGZpbGUgbmFtZXMgKGFuZCBhbnl0aGluZyBlbHNlIGluIHRoaXMgZGlyZWN0b3J5KSB3aGVuIHlvdSB0eXBlIChvciBjb3B5IGFuZCBwYXN0ZSkgdGhlIGZvbGxvd2luZyBsaW5lOgpgYGB7cn0KbGlzdC5maWxlcygpCmBgYAoKSWYgeW91IHNlZSB0aGVzZSBmaWxlcyBsaXN0ZWQsIHlvdSdyZSByZWFkeSB0byByb2xsIQoKIyMgUEFSVCAxOiBJbXBvcnRpbmcgYW5kIHBsb3R0aW5nIHJhdyB0cmVlLXJpbmcgaXNvdG9wZSBkYXRhIFtkMTNDXSAmIEF0bW9zcGhlcmljIERhdGEgCgpJbXBvcnQgYW5kIHBsb3QgdGhlIHJhdyB0cmVlIHJpbmcgZDEzQyBkYXRhc2V0OgpgYGB7cn0KVFIxMyA8LSB0cygocmVhZC50YWJsZSgiTElMLnR4dCIsIGhlYWRlcj1UKSksIHN0YXJ0PTE5MDEsIGZyZXF1ZW5jeT0xKQp0cy5wbG90KFRSMTMudHMseWxhYj0iZDEzQyAocGVybWlsLlZQREIpIix4bGFiPSJZZWFycyIsIGNvbD0iIzlDOTY0QSIpCmBgYAogCkltcG9ydCBhbmQgc3Vic2V0IGF0bW9zcGhlcmljIGRhdGE6IApgYGB7cn0KQVRNIDwtIHRzKChyZWFkLnRhYmxlKCJBVE0udHh0IiwgaGVhZGVyPVQpKSwgc3RhcnQ9KQojIHN1YnNldCBkMTNDCkFUTS4xM0MgPC0gdHMoQVRNWywiYXRtMTNDIl0sc3RhcnQ9MTkwMSwgZnJlcXVlbmN5PTEpCiMgc3Vic2V0IENPMgpBVE0uQ08yIDwtIHRzKEFUTVssImF0bUNPMiJdLHN0YXJ0PTE5MDEsIGZyZXF1ZW5jeT0xKQpgYGAKClBsb3QgdGhlIHJhdyB0cmVlIHJpbmcgZDEzQyAgYW5kIHRoZSBhdG1vc3BoZXJpYyBkMTNDIGRhdGFzZXRzOgpgYGB7cn0KbGF5b3V0KG1hdHJpeCgxOjIsbnJvdyA9IDEsIG5jb2wgPSAyLGJ5cm93ID0gVCksIHdpZHRocyA9IGMoMywzKSxoZWlnaHRzID0gYygzLDMpLHJlc3BlY3QgPSBUUlVFKQp0cy5wbG90KEFUTS4xM0MseWxhYj0iZDEzQyAocGVybWlsLlZQREIpIix4bGFiPSJZZWFycyIsIGNvbD0iIzlDOTY0QSIsbWFpbj0iZDEzQyIpCnRzLnBsb3QoQVRNLkNPMix5bGFiPSJDTzIgKHBwbSkiLHhsYWI9IlllYXJzIiwgbWFpbj0iQ08yIikKCmBgYAogClF1ZXN0aW9uIDE6IENvbXBhcmUgYm90aCB0cmVuZHMuIERlc2NyaWJlIGFuZCBpbnRlcnByZXQgdGhlIHJlbGF0aW9uc2hpcCBiZXR3ZWVuIHRoZSBkZWNsaW5lIGluIGQxM0MgYW5kIHRoZSBpbmNyZWFzZSBpbiBDTzIgY29uY2VudHJhdGlvbi4gCgojIyBQQVJUIDI6IENhbGN1bGF0aW5nIGlXVUUtIFNJTVBMRSBBUFBST0FDSCAKClRoZSBGYXJxdWhhciAxOTgyIGJpb2NoZW1pY2FsIG1vZGVsICBkZXNjcmliZXMgdGhlIGlzb3RvcGljIGRpc2NyaW1pbmF0aW9uIGFnYWluc3QgMTNDICjOlDEzQykgZHVyaW5nIGNhcmJvbiBkaWZmdXNpb24gYW5kIGZpeGF0aW9uIGJ5IHBsYW50cy4gVGhlIEZhcnF1aGFyIGVxdWF0aW9uIGNhbiBiZSB3cml0dGVuIGFzIGZvbGxvd3M6CgrOlDEzQyA9IGErKGItYSkqKGNpL2NhKQoKYT00LjQgaXMgdGhlIGZyYWN0aW9uYXRpb24gZHVlIHRvIENPMiBkaWZmdXNpb24gaW4gYWlyIHRocm91Z2ggdGhlIHN0b21hdGEuCgpiPSAyOCBpcyB0aGUgYXBwYXJlbnQgbmV0IGZyYWN0aW9uYXRpb24gYnkgUnVCaXNDTyBkdXJpbmcgY2FyYm94eWxhdGlvbi4KCmNpIGFuZCBjYSBhcmUgYXJlIHRoZSBsZWFmIGludGVyY2VsbHVsYXIgYW5kIGFtYmllbnQgcGFydGlhbCBwcmVzc3VyZSBvZiBDTzIgKFBhKSwgcmVzcGVjdGl2ZWx5LgoKRnJvbSB0aGUgZXF1YXRpb24gYWJvdmUsIGNpIGNhbiBiZSBjYWxjdWxhdGVkIGFzIGZvbGxvd3M6CgpjaSA9ICBjYSoozpQxM0MtYSkvKGItYSkKCldlIGtub3cgY2EgZnJvbSBtZWFzdXJlbWVudHMuY2EgaXMgaW4gcHBtLiBZb3UgdXNlIHVzZSBjYSBpbiBwbW0gc3VjaCBhczoKYGBge3J9CiMgV2Uga25vdyBjYSBmcm9tIG1lYXN1cmVtZW50cy5jYSBpcyBpbiBwcG0uIHlvdSB1c2UgdXNlIGl0IGFzIGlzIApjYSA8LSBBVE0uQ08yICMgaW4gcHBtCmBgYApPciB1c2UgY2EgaW4gUGEgYXMgZm9sbG93czoKYGBge3J9CiMgeW91IG5lZWQgIHIgcGFja2FnZSAicnBtb2RlbCIKbGlicmFyeSgicnBtb2RlbCIpCmBgYAphbmQgdGhlIGZ1bmN0aW9uIGNhbGNfcGF0bSB7cnBtb2RlbH0gdG8gY2FsY3VsYXRlIGF0bW9zcGhlcmljIHByZXNzdXJlIGF0IHNlYSBsZXZlbC4gVGhlIHZhcmlhYmxlIG5lZWRlZCBpcyBlbGV2YXRpb24uCmBgYHtyfQplbHY9IDE2MDAgIyBFbGV2YXRpb24gYWJvdmUgc2VhLWxldmVsIChtLmEucy5sLikKcGF0bTwtIGNhbGNfcGF0bShlbHYsIHBhdG0wID0gMTAxMzI1KQpgYGAKY2FsY3VsYXRlIGNhIGFzIGZvbGxvd3M6CmBgYHtyfQpjYSA8LSAoIDEuZS02ICkgKiBjYSAqIHBhdG0gICMgaW4gUGEKYGBgCmNvbnZlcnQgY2EgdG8gYSB0aW1lIHNlcmllczoKYGBge3J9CmNhIDwtIHRzKGNhLCBzdGFydD0xOTAxLCBmcmVxdWVuY3k9MSkKYGBgCs6UMTNDIGNhbiB0aGVuIGJlIGNhbGN1bGF0ZWQgYXMgZm9sbG93czoKYGBge3J9CmQxM0MuZGlzYyA8LSAoQVRNLjEzQy1UUjEzKS8oMStUUjEzLzEwMDApCmBgYApBbmQgY2kgYXMgZm9sbG93czoKYGBge3J9CmNpIDwtICBjYSooZDEzQy5kaXNjLWEpLyhiLWEpCmBgYApBbmQgaXd1ZSBhcyBmb2xsb3dzOgpgYGB7cn0KaXd1ZSA8LSAoY2EtY2kpLzEuNgpgYGAKcGxvdCB0aGUgcGh5c2lvbG9naWNhbCBpbmRpY2VzOgpgYGB7cn0KbGF5b3V0KG1hdHJpeCgxOjYsbnJvdyA9IDMsIG5jb2wgPSAyLGJ5cm93ID0gRiksIHdpZHRocyA9IGMoMywzLDMpLGhlaWdodHMgPSBjKDMsMywzKSxyZXNwZWN0ID0gVFJVRSkKCnRzLnBsb3QoVFIxMyx5bGFiPSJkMTNDIChwZXJtaWwuVlBEQikiLHhsYWI9IlllYXJzIiwgbWFpbj0iT0JTRVJWQVRJT05TIikKdHMucGxvdChkMTNDLmRpc2MseWxhYj0iRDEzQyAocGVybWlsLlZQREIpIix4bGFiPSJZZWFycyIsIG1haW49IiIpCnRzLnBsb3QoY2EseWxhYj0iQ08yIChwYSkiLHhsYWI9IlllYXJzIiwgbWFpbj0iIikKdHMucGxvdChjaSx5bGFiPSJjaSAocGEpIix4bGFiPSJZZWFycyIsIG1haW49IkZBUlFVSEFSLU1PREVMIikKdHMucGxvdChpd3VlLHlsYWI9IiBpd3VlICh1bW9sL21vbCkiLHhsYWI9IlllYXJzIiwgbWFpbj0iIikKdHMucGxvdChjaS9jYSx5bGFiPSJjaS9jYSIseGxhYj0iWWVhcnMiLCBtYWluPSIiKQoKYGBgClF1ZXN0aW9uIDI6IERlc2NyaWJlIHRoZSB0cmVuZHMgb2YgdGhlIHZhcmlvdXMgcGh5c2lvbG9naWNhbCBpbmRpY2VzLgoKUXVlc3Rpb24gMzogQmFzZWQgb24gd2hhdCB5b3UgaGF2ZSBsZWFybmVkIGluIHRoZSBJc290b3BlIHRoZW9yeSBsZWN0dXJlcywgZGVzY3JpYmUgdGhlIHRyZWVzJ3BoeXNpb2xvZ2ljYWwgcmVzcG9uc2Ugb3ZlciB0aW1lIGF0IHRoaXMgc2l0ZS4KCgojIyBQQVJUIDM6IENhbGN1bGF0aW5nIGlXVUUtIENPTVBSRUhFTlNJVkUgQVBQUk9BQ0ggCgpJbiB0aGUgRmFycXVoYXIgbW9kZWwsIHRoZSBkMTNDIGlzIHRoZSBpc290b3BpYyByYXRpbyBmb3Igc3VnYXJzIGZpeGVkIGluIHRoZSBsZWFmLiBGb3IgdHJlZS1yaW5nIGNlbGx1bG9zZSwgYSBjb3JyZWN0aW9uIGZhY3RvciBpcyB1c2VkIHRvIGFjY291bnQgZm9yIHRoZSBvZmZzZXQgb2YgZDEzQyBiZXR3ZWVuIGxlYWYgc3VnYXJzIGFuZCB0cmVlLXJpbmcgY2VsbHVsb3NlLiBUaGUgb2Zmc2V0IHJlc3VsdHMgZnJvbSBwb3N0LXBob3Rvc3ludGhldGljIGZyYWN0aW9uYXRpb24gcHJvY2Vzc2VzIChHZXNzbGVyIGV0IGFsLiwgMjAxNCkuIAoKVGhlIG9mZnNldCBiZXR3ZWVuIHdob2xlIHdvb2QgYW5kIGxlYXZlcyBpcyB+MS4zIMKxIDAuMuKAsCBmb3Igb2FrIGFuZCBjb25pZmVyIHNwZWNpZXMuIEFkZGl0aW9uYWwgaXNvdG9waWMgb2Zmc2V0cyBpbmNsdWRlIHRoZSBkaWZmZXJlbmNlIGJldHdlZW4gdHJlZS1yaW5nIGNlbGx1bG9zZSBhbmQgYnVsayB3b29kIHdpdGggYW4gYXZlcmFnZSB2YWx1ZSBvZiB+MS4zIMKxIDAuMuKAsCwgYW5kIGlzb3RvcGljIGRlcGxldGlvbiBiZXR3ZWVuIHByaW1hcnkgYXNzaW1pbGF0ZXMgYW5kIGJ1bGsgbGVhZiB3aXRoIHZhbHVlcyBvZiAtMC41IMKxIDHigLAuIAoKVXBzY2FsaW5nIGQxM0MgbWVhc3VyZW1lbnRzIGZyb20gdHJlZSByaW5ncyB0byB0aGUgbGVhZiBsZXZlbCBjYW4gc2lnbmlmaWNhbnRseSBpbXByb3ZlIGVzdGltYXRlcyBvZiDOlDEzQyBhbmQgaGVuY2UgcmVkdWNlIHVuY2VydGFpbnRpZXMgaW4gdGhlIGRldGVybWluYXRpb24gb2YgdGhlIHJhdGlvIG9mIGNpIHRvIGNhLgoKV2UgY2FuIHNjYWxlIHRyZWUgcmluZyBkMTMgdG8gbGVhZiBsZXZlbCB1c2luZyBhIGZhY3RvciBkLgoKZCByZXByZXNlbnRzIHRoZSBzdW0gb2YgcG9zdC1waG90b3N5bnRoZXRpYyBpc290b3BlIGZyYWN0aW9uYXRpb25zIGJldHdlZW4gdGhlIGxlYWYgb3JnYW5pYyBtYXR0ZXIgYW5kIHRoZSBwbGFudCBtYXRlcmlhbCBjb25zaWRlcmVkLiBDaG9vc2UgdGhlIGQgdmFsdWUgYmFzZWQgb24gdGhlIHN0dWRpZWQgbWF0ZXJpYWwgKCBmb3IgdGhpcyBzaXRlLCBpdCBpcyBjZWxsdWxvc2UpCgpgYGB7cn0KZD0xLjkgIyBmb3IgZDEzQyBtZWFzdXJlZCBpbiB3b29kCmQ9Mi4xICMgZm9yIGQxM0MgbWVhc3VyZWQgaW4gY2VsbHVsb3NlCmBgYAoKVGhpcyBjb3JyZWN0aW9uIGNhbiBiZSBtYWRlIGFzIGZvbGxvd3M6CmBgYHtyfQpkMTNDLmRpc2MubGVhZiA8LSAoQVRNLjEzQy0oVFIxMy1kKSkvKDErKFRSMTMtZCkvMTAwMCkKYGBgCgpMZWFmIGxldmVsIGNpIGNhbiBiZSBjYWxjdWxhdGVkIGFzIGZvbGxvd3M6CmBgYHtyfQpjaS5sZWFmIDwtICBjYSooZDEzQy5kaXNjLmxlYWYtYSkvKGItYSkKYGBgCgpMZWFmIGxldmVsIGl3dWUgY2FuIGJlIGNhbGN1bGF0ZWQgYXMgZm9sbG93czoKYGBge3J9Cml3dWUubGVhZiA8LSAoY2EtY2kubGVhZikvMS42CmBgYApub3cgYWRkIHRoZSBsZWFmIGxldmVsIHBoeXNpb2xvZ2ljYWwgaW5kaWNlcyB0byB0aGUgcHJldmlvdXMgcGxvdDoKYGBge3J9CmxheW91dChtYXRyaXgoMTo2LG5yb3cgPSAzLCBuY29sID0gMixieXJvdyA9IEYpLCB3aWR0aHMgPSBjKDMsMywzKSxoZWlnaHRzID0gYygzLDMsMykscmVzcGVjdCA9IFRSVUUpCiMgTm90ZSB5b3UgbWlnaHQgbmVlZCB0byBhZGp1c3QgdGhlIHlsaW0gdmFsdWVzLgp0cy5wbG90KFRSMTMseWxhYj0iZDEzQyAocGVybWlsLlZQREIpIix4bGFiPSJZZWFycyIsIG1haW49Ik9CU0VSVkFUSU9OUyIpCnRzLnBsb3QoZDEzQy5kaXNjLHlsYWI9IkQxM0MgKHBlcm1pbC5WUERCKSIseGxhYj0iWWVhcnMiLCBtYWluPSIiKTsgbGluZXMoZDEzQy5kaXNjLmxlYWYsIGNvbD0iIzBCNzc1RSIpCnRzLnBsb3QoY2EseWxhYj0iQ08yIChwcG0pIix4bGFiPSJZZWFycyIsIG1haW49IiIpCnRzLnBsb3QoY2kseWxhYj0iY2kgKHBhKSIseGxhYj0iWWVhcnMiLCBtYWluPSJGQVJRVUhBUi1NT0RFTCIpOyBsaW5lcyhjaS5sZWFmLCBjb2w9IiMwQjc3NUUiKQp0cy5wbG90KGl3dWUseWxhYj0iIGl3dWUgKHVtb2wvbW9sKSIseGxhYj0iWWVhcnMiLCBtYWluPSIiKTsgbGluZXMoaXd1ZS5sZWFmLCBjb2w9IiMwQjc3NUUiKQp0cy5wbG90KGNpL2NhLHlsYWI9ImNpL2NhIix4bGFiPSJZZWFycyIsIG1haW49IiIpOyBsaW5lcyhjaS5sZWFmL2NhLCBjb2w9IiMwQjc3NUUiKQpgYGAKUXVlc3Rpb24gNDogV2hhdCBkaWZmZXJlbmNlcyBkbyB5b3Ugb2JzZXJ2ZSBiZXR3ZWVuIHBoeXNpb2xvZ2ljYWwgaW5kaWNlcyBhdCBzdGVtIGxldmVsIGFuZCBsZWFmIGxldmVsPwoKClRoZSB2ZXJzaW9uIG9mIHRoZSBGYXJxdWhhciBtb2RlbCB3ZSB1c2VkIGFib3ZlIGlzIGEgc2ltcGxpZmllZCBkZXNjcmlwdGlvbiBvZiB0aGUgaXNvdG9waWMgZGlzY3JpbWluYXRpb24uCkl0IGRvZXMgbm90IGluY2x1ZGUgdGhlIGZyYWN0aW9uYXRpb24gZWZmZWN0cyBkdXJpbmcgdGhlIHRyYW5zZmVyIG9mIENPMiBmcm9tIHN1YnN0b21hdGFsIGNhdml0aWVzIHRvIHRoZSBzaXRlIG9mIGZpeGF0aW9uIHZpYSB0aGUgbWVzb3BoeWxsLCBhbmQgZHVyaW5nIG1pdG9jaG9uZHJpYWwgcmVzcGlyYXRpb24gYW5kIHBob3RvcmVzcGlyYXRpb24uIFdoaWxlIHRoZSBtZXNvcGh5bGwgZnJhY3Rpb25hdGlvbiBhbmQgdGhlaXIgdmFsdWVzIHJlbWFpbiBoaWdobHkgdW5jb25zdHJhaW5lZCwgcmVjZW50IHN0dWRpZXMgaGF2ZSByZWNvbW1lbmRlZHRoZSBpbmNsdXNpb24gb2YgdGhlIHBob3RvcmVzcGlyYXRvcnkgZWZmZWN0IGluIHRoZSBkaXNjcmltaW5hdGlvbiBtb2RlbCBhcyB0aGlzIHRlcm0gY29udHJpYnV0ZXMgdG8gYW4gaW5jcmVhc2Ugb2YgzpQxM0Mgd2l0aCBjYSByaXNlIGJ5IDAuMDA04oCwIHBwbS0xIChLZWVsaW5nIGV0IGFsLiwgMjAxNzsgTGF2ZXJnbmUgZXQgYWwuLCAyMDE5KS4KCgpBIEZhcnF1aGFyIG1vZGVsIHRoYXQgaW5jbHVkZXMgdGhlIHBob3RvcmVzcGlyYXRvcnkgdGVybSBpcyBhcyBmb2xsb3dzOgoKzpQxM0MgPSBhKyhiLWEpKihjaS9jYSkgLWYqKEdzdC9jYSkKClRoZSBwaG90b3Jlc3BpcmF0b3J5IHRlcm0gaXMgdGhlOiBmKihHc3QvY2EpCgpUaGUgZnJhY3Rpb25hdGlvbiBkdWUgdG8gcGhvdG9yZXNwaXJhdGlvbiwgZiwgaXMgMTIgcGVybWlsLiAKCkdzdCAob3IgzpMqLCBHYW1tYSBTdGFyKSBpcyB0aGUgQ08yIGNvbXBlbnNhdGlvbiBwb2ludCBpbiB0aGUgYWJzZW5jZSBvZiBtaXRvY2hvbmRyaWFsIHJlc3BpcmF0aW9uIChQYSksIGl0IGlzIGNhbGN1bGF0ZWQgZnJvbSB0aGUgdGVtcGVyYXR1cmUgKFQpIGFuZCBhdG1vc3BoZXJpYyBwcmVzc3VyZSByZXNwb25zZS5Zb3UgY2FuIHVzZSB0aGUgY2FsY19nYW1tYXN0YXIodGMsIHBhdG0pIGZ1bmN0aW9uIGZyb20gdGhlIHJwbW9kZWwgdG8gY2FsY3VsYXRlIEdhbW1hIFN0YXIKCgoKQmFzZWQgb24gTm90ZWJvb2sgMSBhbmQgdGhlIHRlbXBlcmF0dXJlIGZpbGUsIGRlZmluZSB0aGUgYXBwcm9wcmlhdGUgdGVtcGVyYXR1cmUgd2luZG93IChlLmcuYXZlcmFnZSBncm93aW5nIHNlYXNvbikuIFRoaXMgaGFzIHRvIGJlIGEgVGltZSBzZXJpZXMgb2Ygc2l0ZSBsZXZlbCB0ZW1wZXJhdHVyZSB2YXJpYWJpbGl0eSBkdXJpbmcgdGhlIHN1bW1lciBvciBncm93aW5nIHNlYXNvbiBvciByZWxldmFudCBzZWFzb24gZm9yIHRyZWVzIGF0IHRoaXMgc2l0ZS4gQmVsb3cgaXMgYW4gZXhhbXBsZSBmb3Igc3VtbWVyIChKdW5lLUp1bHktQXVndXN0KToKYGBge3J9CmdyaWRkZWQudHQuZGF0YSA8LSB0cyhyZWFkLnRhYmxlKCJDUlVfVFQudHh0IixoZWFkZXI9VCksc3RhcnQ9MTkwMSxmcmVxdWVuY3k9MSkKdHQuSkpBIDwtIHJvd01lYW5zKGdyaWRkZWQudHQuZGF0YVssYyg2LDcsOCldKQp0dC5KSkEgPC0gdHModHQuTWFyX0p1bixzdGFydD0xOTAxLGZyZXF1ZW5jeSA9MSkKYGBgCgpDYWxjdWxhdGUgZ2FtbWEgc3RhciBhcyBmb2xsb3dzOgpgYGB7cn0KdGMgPC0gdHQuSkpBICMgYW5kIHBhdG0gaGFzIGJlZW4gZGVmaW5lZCBlYXJsaWVyLgpHc3QgPC0gY2FsY19nYW1tYXN0YXIodGMsIHBhdG0pCmBgYAoKQW5kIHRoZSBwaG90b3Jlc3BpcmF0b3J5IHRlcm0gYXMgZm9sbG93czoKYGBge3J9CnBob3RvcmVzcF90ZXJtIDwtIDEyKihHc3QvY2EpICMgY2EgaXMgIGluIFBhCmBgYApDYWxjdWxhdGUgY2kgdG8gaW5jbHVkZSBwaG90b3Jlc3BpcmF0aW9uOgpgYGB7cn0KY2kubGVhZi5waG90byA8LSAgY2EqKGQxM0MuZGlzYy5sZWFmLWErcGhvdG9yZXNwX3Rlcm0pLyhiLWEpCmBgYApBbmQgaXd1ZSB0byBpbmNsdWRlIHBob3RvcmVzcGlyYXRpb246CmBgYHtyfQppd3VlLmxlYWYucGhvdG8gPC0gKGNhLWNpLmxlYWYucGhvdG8pLzEuNgpgYGAKClBsb3QgdGhlIGxlYWYgbGV2ZWwgcGh5c2lvbG9naWNhbCBwYXJhbWV0ZXJzIHVzaW5nIHRoZSBzaW1wbGUgYW5kIHBob3RvcmVzcGlyYXRpb24gbW9kZWxzOgpgYGB7cn0KCmxheW91dChtYXRyaXgoMTo2LG5yb3cgPSAzLCBuY29sID0gMixieXJvdyA9IEYpLCB3aWR0aHMgPSBjKDMsMywzKSxoZWlnaHRzID0gYygzLDMsMykscmVzcGVjdCA9IFRSVUUpCiMgTm90ZSB5b3UgbWlnaHQgbmVlZCB0byBhZGp1c3QgdGhlIHlsaW0gdmFsdWVzLgp0cy5wbG90KFRSMTMseWxhYj0iZDEzQyAocGVybWlsLlZQREIpIix4bGFiPSJZZWFycyIsIG1haW49Ik9CU0VSVkFUSU9OUyIpCnRzLnBsb3QoZDEzQy5kaXNjLmxlYWYseWxhYj0iRDEzQyAocGVybWlsLlZQREIpIix4bGFiPSJZZWFycyIsIG1haW49IiIpCnRzLnBsb3QoY2EseWxhYj0iQ08yIChwYSkiLHhsYWI9IlllYXJzIiwgbWFpbj0iIikKdHMucGxvdChjaS5sZWFmLHlsYWI9ImNpIChwYSkiLHhsYWI9IlllYXJzIiwgbWFpbj0iRkFSUVVIQVJfTU9ERUwiKTsgbGluZXMoY2kubGVhZi5waG90bywgY29sPSIjMEI3NzVFIikKdHMucGxvdChpd3VlLmxlYWYseWxhYj0iIGl3dWUgKHVtb2wvbW9sKSIseGxhYj0iWWVhcnMiLCBtYWluPSIiKTsgbGluZXMoaXd1ZS5sZWFmLnBob3RvLCBjb2w9IiMwQjc3NUUiKQp0cy5wbG90KGNpLmxlYWYvY2EseWxhYj0iY2kvY2EiLHhsYWI9IlllYXJzIiwgbWFpbj0iIik7IGxpbmVzKGNpLmxlYWYucGhvdG8vY2EsIGNvbD0iIzBCNzc1RSIpCmxlZ2VuZCgiYm90dG9tbGVmdCIsYygiU0lNUExFIiwgIlBIT1RPIiksbHdkPSBjKDEsMSksIGJ0eSA9ICJuIiwgY29sPWMoImJsYWNrIiwiIzBCNzc1RSIpLAogICAgICAgdGV4dC5jb2w9YygiYmxhY2siLCIjMEI3NzVFIiksbmNvbD0xKQoKYGBgCgpRdWVzdGlvbiA1OiBEbyB0aGUgdHJlbmRzIGFuZCBhbXBsaXR1ZGUgb2YgaW50ZXJhbm51YWwgdmFyaWFiaWxpdHkgdmFyeSBiZXR3ZWVuIHRoZSBzaW1wbGUgbW9kZWwKYW5kIHRoZSBvbmUgaW5jbHVkaW5nIHBob3RvcmVzcGlyYXRpb24/CgojIyBQQVJUIDQ6IGludGVycHJldGluZyBpV1VFIGFuZCBsZWFmIGdhcyBleGNoYW5nZSBzdHJhdGVnaWVzIAoKRnJvbSB0aGUgcGFydHMgYWJvdmUsIHlvdSBoYXZlIG5vdyBjYWxjdWxhdGVkIHBoeXNpb2xvZ2ljYWwgcGFyYW1ldGVycyB1c2luZyBiZXN0IHByYWN0aWNlcyB0byBhY2NvdW50IGZvciBtb3N0IGZyYWN0aW9uYXRpb24gZmFjdG9ycywgdXNpbmcgdGhlIG1vc3QgdXBkYXRlZCBzb3VyY2UgZGF0YSwgYW5kIHNjYWxpbmcgdG8gbGVhZiBsZXZlbC4KCkluIHRoZSBmb2xsb3dpbmcsIHdlIGFyZSBnb2luZyB0byBpbnRlcnByZXQgdmFyaWF0aW9ucyBvZiB0aGlzIHBoeXNpb2xvZ2ljYWwgcGFyYW1ldGVycy4gV2Ugd2lsbCBmb2N1cyBvbiB0aG9zZSBwaHlzaW9sb2dpY2FsIHBhcmFtZXRlcnMgdXNpbmcgdGhlIG1vZGVsIHdpdGggcGhvdG9yZXNwaXJhdGlvbi4KCkZpcnN0LCBjb21wdXRlIHRoZSB0cmVuZHMgb2YgaVdVRSwgY2kgYW5kIGNpL2NhIG92ZXIgdGhlIHBlcmlvZCBvZiByZWNvcmQuIHlvdSBjYW4gdXNlIHRoZSBsbSBmdW5jdGlvbiBhbmQgdGhlIHN1bW1hcnkgdG8gbG9vayBhdCBhbmQgcmVwb3J0IHRoZSBzdGF0aXN0aWNzIChSMiwgcCB2YWx1ZSkuIEhlcmUgaXMgYSBmaXJzdCBleGFtcGxlIHdpdGggaVdVRToKYGBge3J9Cml3dWUubGluZWFyIDwtIGxtKGl3dWUubGVhZi5waG90byB+IHNlcSgxOTAxLDIwMDIsYnk9MSkpCnN1bW1hcnkoaXd1ZS5saW5lYXIpCmBgYApSZXBlYXQgdGhlc2Ugc3RlcHMgZm9yIGNpIGFuZCBjaS9jYToKYGBge3J9CiMgY2kubGluZWFyIDwtIApgYGAKUGxvdCB0aW1lLXNlcmllcyBvZiBpV1VFLCBjaSBhbmQgY2kvY2EgYW5kIGFkZCB0aGUgbGluZWFyIHRyZW5kLiBIZXJlIGlzIGEgZmlyc3QgZXhhbXBsZSB3aXRoIGlXVUUuIFlvdSBjYW4gdXNlIHRoZSBsYXlvdXQgdG8gaGF2ZSAzIHBsb3RzOgpgYGB7cn0KbGF5b3V0KG1hdHJpeCgxOjMsbnJvdyA9IDEsIG5jb2wgPSAzLGJ5cm93ID0gVCksIHdpZHRocyA9IGMoMywzLDMpLGhlaWdodHMgPSBjKDMsMywzKSxyZXNwZWN0ID0gVFJVRSkKdHMucGxvdChpd3VlLmxlYWYucGhvdG8seWxhYj0iIGl3dWUgKHVtb2wvbW9sKSIseGxhYj0iWWVhcnMiLCBtYWluPSIiKSAKYWJsaW5lKGl3dWUubGluZWFyLCBjb2w9IiMwQjc3NUUiLGx3ZD0yLGx0eT0zKQoKYGBgCgpRdWVzdGlvbiA2OiBVc2luZyBjb21wdXRlZCBzdGF0aXN0aWNzIGFib3ZlLCBEZXNjcmliZSB0aGUgdHJlbmRzIGFuZCB0aGVpciBzaWduaWZpY2FuY2UgZm9yIGVhY2ggb2YgdGhlIHBoeXNpb2xvZ2ljYWwgaW5kaWNlcy4KClF1ZXN0aW9uIDc6IEhvdyBkbyB5b3UgaW50ZXJwcmV0IHRoZSBjaS9jYSB0cmVuZHMgaW4gdGVybSBvZiBzdG9tYXRhbCBjb25kdWN0YW5jZT8gCgpRdWVzdGlvbiA4OiBXYXMgdGhlIGlXVUUgaW5jcmVhc2Ugc3RlYWR5IG92ZXIgdGltZT8KClF1ZXN0aW9uIDk6IFdoYXQgd2FzIHRoZSByYXRlIG9mIHRoZSBjaSAocGEueWVhci0xKSBpbmNyZWFzZSBvdmVyIHRpbWU/IAoKUXVlc3Rpb24gMTA6IFdhcyB0aGlzIHJhdGUgc3RlYWR5L2NvbnN0YW50IG92ZXIgdGltZT8KClF1ZXN0aW9uIDExOiBjb21wYXJlZCB0byB0aGUgcmF0ZSBvZiBjYSwgd2FzIHRoZSByYXRlIG9mIGNpOiBhKSBwcm9wb3J0aW9uYWwgICBiKSBzaW1pbGFyLlRvIGFuc3dlciB0aGlzIHF1ZXN0aW9uLCB5b3UgbmVlZCB0byBlc3RpbWF0ZSB0aGUgcmF0ZSBvZiBjYSB1c2luZyBsbSBhbmQgc3VtbWFyeSBmdW5jdGlvbnMuCgpFc3RpbWF0ZSB0aGUgY2kgaW5jcmVhc2UgcmVsYXRpdmUgdG8gY2EuIFlvdSBjYW4gZG8gdGhpcyBieSByZWdyZXNzaW5nIGNpIGJ5IGNhLgpgYGB7cn0KY2kubGluZWFyIDwtIGxtKGNpIH4gY2EpCnN1bW1hcnkoY2kubGluZWFyKQpgYGAKClF1ZXN0aW9uIDEyOiBSZXBvcnQgdGhlIHJhdGUgYW5kIGRlc2NyaWJlIGl0IGluIHRlcm1zIG9mIGEpIHByb3BvcnRpb25hbCAgIGIpIHNpbWlsYXIuIE5vdGUgdGhhdCB0aGlzIHJhdGUgdHJhbnNsYXRlIHRoZSBjaSBpbmNyZWFzZSBmb3IgZWFjaCBwcG0vcGEgb2YgY2EgaW5jcmVhc2UuCgpRdWVzdGlvbiAxMzogTG9va2luZyBhdCBhbGwgcGh5c2lvbG9naWNhbCBpbmRpY2VzLCB0aGVpciB0cmVuZHMgYW5kIHJhdGVzLCBob3cgZG8geW91IGludGVycHJldCB0aGUgdGVtcG9yYWwgdmFyaWF0aW9ucyBvZiBzdG9tYXRhbCBjb25kdWN0YW5jZSBhbmQgcGhvdG9zeW50aGVzaXMgb2YgdGhlc2UgdHJlZXM/CgoKV2l0aCByaXNpbmcgY2EsIHZhcmlhdGlvbnMgaW4gcGxhbnQgzpQxM0MgaGF2ZSBiZWVuIGdyb3VwZWQgaW50byB0aHJlZSBsZWFmIGdhcy1leGNoYW5nZSBzdHJhdGVnaWVzOgoKKDEpIGNvbnN0YW50IGNpLCAoMikgY29uc3RhbnQgY2kvY2EsIGFuZCAoMykgY29uc3RhbnQgY2Eg4oiSIGNpLiAKClRoZSBmaXJzdCB0d28gc3RyYXRlZ2llcyBhcmUgY29uc2lkZXJlZCBhY3RpdmUsIGFuZCB0aGUgdGhpcmQgcGFzc2l2ZS4gVGhlc2UgdGhlb3JldGljYWwgY29uc2lkZXJhdGlvbnMgc2VydmUgYXMgdGhlIGJhc2lzIGZvciB0aGUgaW50ZXJwcmV0YXRpb24gb2YgdGhlIHBoeXNpb2xvZ2ljYWwgbWVjaGFuaXNtcyB1bmRlcmx5aW5nIGlXVUUgdHJlbmRzLgoKQ2FsY3VsYXRlIGNpIGZvbGxvd2luZyBzY2VuYXJpbyAxOgpgYGB7cn0KIyBmaXJzdCwgZXN0aW1hdGUgdGhlIGF2ZXJhZ2UgY2kgZnJvbSB0cmVlIHJpbmcgZm9yIHRoZSBmaXJzdCBkZWNhZGUgb2YgdGhlIHJlY29yZApjaS5hdmVyYWdlXzFkZWNhZGUgPC0gbWVhbihjaS5sZWFmLnBob3RvWzE6MTBdKQpjaS5zY2VuYXJpbzEgPC0gdHMocmVwKGNpLmF2ZXJhZ2VfMWRlY2FkZSwgMTAyKSwgc3RhcnQ9MTkwMSwgZnJlcXVlbmN5PTEpCmBgYApDYWxjdWxhdGUgY2kgZm9sbG93aW5nIHNjZW5hcmlvIDI6CmBgYHtyfQojIGZpcnN0LCBlc3RpbWF0ZSB0aGUgYXZlcmFnZSBjaS9jYSBmcm9tIHRyZWUgcmluZyBmb3IgdGhlIGZpcnN0IGRlY2FkZSBvZiB0aGUgcmVjb3JkCmNpY2EuYXZlcmFnZV8xZGVjYWRlIDwtIG1lYW4oKGNpLmxlYWYucGhvdG8vY2EpWzE6MTBdKQpjaS5zY2VuYXJpbzIgPC1jYSpjaWNhLmF2ZXJhZ2VfMWRlY2FkZQpgYGAKQ2FsY3VsYXRlIGNpIGZvbGxvd2luZyBzY2VuYXJpbyAzOgpgYGB7cn0KIyBmaXJzdCwgZXN0aW1hdGUgdGhlIGF2ZXJhZ2UgY2EtY2kgZnJvbSB0cmVlIHJpbmcgZm9yIHRoZSBmaXJzdCBkZWNhZGUgb2YgdGhlIHJlY29yZApjYWNpLmF2ZXJhZ2VfMWRlY2FkZSA8LSBtZWFuKChjYS1jaS5sZWFmLnBob3RvKVsxOjEwXSkKY2kuc2NlbmFyaW8zIDwtY2EtY2FjaS5hdmVyYWdlXzFkZWNhZGUKCmBgYApQbG90IHRoZSBvYnNlcnZlZCBjaSB3aXRoIHRoZSBwcmVkaWN0ZWQgY2kgZm9sbG93aW5nIHRoZSAzIHNjZW5hcmlvczoKYGBge3J9CnRzLnBsb3QoY2kubGVhZi5waG90byx5bGFiPSJjaSAocGEpIix4bGFiPSJZZWFycyIsIG1haW49IiIsIHlsaW09YygxNSwyNSkpCmxpbmVzKGNpLnNjZW5hcmlvMSwgbHR5PTIsIGNvbD0iI0YyQUQwMCIsbHdkPTIpCmxpbmVzKGNpLnNjZW5hcmlvMiwgbHR5PTYsIGNvbD0iI0YyQUQwMCIsbHdkPTIpCmxpbmVzKGNpLnNjZW5hcmlvMywgbHR5PTMsIGNvbD0iI0YyQUQwMCIsbHdkPTIpCmxlZ2VuZCgidG9wbGVmdCIsYygiY2ktb2JzZXJ2ZWQiLCAiY2kgY29uc3RhbnQiLCJjaS9jYSBjb25zdGFudCIsImNhLWNpIGNvbnN0YW50IiksCiAgICAgICBsdHk9IGMoMSwyLDYsMyksIGx3ZD1jKDEsMiwyLDIpLGJ0eSA9ICJuIiwgY29sPWMoImJsYWNrIiwiI0YyQUQwMCIsIiNGMkFEMDAiLCIjRjJBRDAwIiksCiAgICAgICB0ZXh0LmNvbD1jKCJibGFjayIsIiNGMkFEMDAiLCIjRjJBRDAwIiwiI0YyQUQwMCIpLCBuY29sPTEpCmBgYAoKUXVlc3Rpb24gMTQ6IERvZXMgdGhlIG9ic2VydmVkIGNpIChkZXJpdmVkIGZyb20gdHJlZSByaW5ncykgZm9sbG93IGFueSBvZiB0aGUgMyBzY2VuYXJpb3M/CgpRdWVzdGlvbiAxNTogICBEb2VzIHRoZSBvYnNlcnZlZCBjaSBmb2xsb3cgYSBzY2VuYXJpbyBjb25zaXN0ZW50bHkgdGhyb3VnaG91dCB0aGUgcmVjb3JkPwoKQ29tcHV0ZSBpd3VlIGZvbGxvd2luZyB0aGUgdGhyZWUgc2NlbmFyaW9zICh1c2luZyBjaSBmb3IgMyBzY2VuYXJpb3MgZnJvbSBhYm92ZSkgYW5kIHBsb3Qgd2l0aCBvYnNlcnZlZCBpd3VlOgpgYGB7cn0KIyBpd3VlLnNjZW5hcmlvMSA8LSAKYGBgCgojIyBEaXNjdXNzaW9uIAoKRnJvbSBOb3RlYm9vayAxLCB5b3UgYXNzZXNzZWQgY2xpbWF0ZSBjb3JyZWxhdGlvbnMgYmV0d2VlbiAxM0MgYW5kIGNsaW1hdGUgdmFyaWFibGVzLiBCYXNlZCBvbiB0aGUgY2xpbWF0ZSB0cmVuZHMgYW5kIHRyZWUgcmluZyBkMTNDIHNlbnNpdGl2aXR5IHRvIHRoZXNlIGNsaW1hdGUgZmFjdG9ycy90cmVuZHMsIGFuc3dlciB0aGUgZm9sbG93aW5nOgoKUXVlc3Rpb24gMTY6IEhvdyBkbyB5b3UgaW50ZXJwcmV0IHRoZSBjaGFuZ2UgKGluY3JlYXNlKSBpbiBpd3VlPwoKUXVlc3Rpb24gMTc6IGlzIGl0IGRyaXZlbiBieSBhbiBpbmNyZWFzZSBpcyBwaG90b3N5bnRoZXRpYyBhc3NpbWlsYXRpb24/CgpRdWVzdGlvbiAxODogaXMgaXQgZHJpdmVuIGJ5IGEgZGVjcmVhc2UgaXMgc3RvbWF0YWwgY29uZHVjdGFuY2U/CgpRdWVzdGlvbiAxOTogYXJlIGl3dWUsIHBob3Rvc3ludGhldGljIGFzc2ltaWxhdGlvbixzdG9tYXRhbCBjb25kdWN0YW5jZSBkcml2ZW4gYnkKCiBhKSByaXNpbmcgY2EsIGIpIHRyZW5kcyBpbiBjbGltYXRlLCBjKSBib3RoPwogClF1ZXN0aW9uIDIwOiBkaXNjdXNzIGhvdyB0cmVuZHMgaW4gY2EgYW5kL29yIGNsaW1hdGUgYXJlIGFmZmVjdGluZyB0cmVlIHBoeXNpb2xvZ3kK</div>
 
 
 
