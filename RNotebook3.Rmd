@@ -3,14 +3,15 @@ title: "Calculation and interpretation of physiological indices derived from tre
 output: html_notebook
 ---
 
-
 Isotope Dendrochronology
-Calculation and interpretation of physiological indices derived from d13C
+Calculation and interpretation of physiological indices derived from tree ring d13C
 COURSE: DISC, LTRR, UNIVERSITY OF ARIZONA. INSTRUCTORS: S. BELMECHERI & P. SZEJNER
 
 The following code and comments should further your experience using tree ring and atmospheric d13C data to calculate WUE and other physiological indices. This exercise relies upon raw tree-ring d13C measurements, atmospheric d13C measurements, and uses the Farqhuar 1982 model.
 
 There are a few questions throughout to catalyze understanding and critical thinking. The analysis is broken into 4 main parts -including 20 questions, at the end you should have gone through many of the steps commonly used for reconstructing and interpreting iWUE derived from tree ring d13C. You will also be familiar with uncertainties related to such calculations and best practices to perform them.
+
+You will need to download the R project fromchttps://github.com/SBelmecheri/DISCO-Ntebook3.git and to set your own working directory. Once you open the Notebook 3.Rproj in R studio  you can open the Notebook 3.Rmd file to proceed with the activity.
 
 ## PART 0: Setting up directories and files 
 
@@ -29,7 +30,7 @@ The command "setwd" is used for this as in the following line:
 setwd("~/Documents/DISC/NOTEBOOK3")
 ```
 
-You will also need to install and load the dplR package, and the rpmodel Correction Package:
+You will also need to install and load the dplR and  rpmodel packages:
 ```{r}
 library(dplR)
 library(rpmodel)
@@ -47,16 +48,16 @@ If you see these files listed, you're ready to roll!
 Import and plot the raw tree ring d13C dataset:
 ```{r}
 TR13 <- ts((read.table("LIL.txt", header=T)), start=1901, frequency=1)
-ts.plot(TR13.ts,ylab="d13C (permil.VPDB)",xlab="Years", col="#9C964A")
+ts.plot(TR13,ylab="d13C (permil.VPDB)",xlab="Years", col="#9C964A")
 ```
  
 Import and subset atmospheric data: 
 ```{r}
-ATM <- ts((read.table("ATM.txt", header=T)), start=)
+ATM <- ts((read.table("ATM.txt", header=T)), start=1901, frequency=1)
 # subset d13C
-ATM.13C <- ts(ATM[,"atm13C"],start=1901, frequency=1)
+ATM.13C <- ATM[,"atm13C"]
 # subset CO2
-ATM.CO2 <- ts(ATM[,"atmCO2"],start=1901, frequency=1)
+ATM.CO2 <- ATM[,"atmCO2"]
 ```
 
 Plot the raw tree ring d13C  and the atmospheric d13C datasets:
@@ -71,7 +72,7 @@ Question 1: Compare both trends. Describe and interpret the relationship between
 
 ## PART 2: Calculating iWUE- SIMPLE APPROACH 
 
-The Farquhar 1982 biochemical model  describes the isotopic discrimination against 13C (Δ13C) during carbon diffusion and fixation by plants. The Farquhar equation can be written as follows:
+The Farquhar 1982 biochemical model describes the isotopic discrimination against 13C (Δ13C) during carbon diffusion and fixation by plants. The Farquhar equation can be written as follows:
 
 Δ13C = a+(b-a)*(ci/ca)
 
@@ -85,7 +86,7 @@ From the equation above, ci can be calculated as follows:
 
 ci =  ca*(Δ13C-a)/(b-a)
 
-We know ca from measurements.ca is in ppm. You use use ca in pmm such as:
+We know ca from measurements.ca is in ppm. You can use ca in ppm such as:
 ```{r}
 # We know ca from measurements.ca is in ppm. you use use it as is 
 ca <- ATM.CO2 # in ppm
@@ -108,6 +109,11 @@ convert ca to a time series:
 ```{r}
 ca <- ts(ca, start=1901, frequency=1)
 ```
+
+WARNING *********
+Make sure you selected a ca in ppm or pa (by commenting the one you discard)
+WARNING *********
+
 Δ13C can then be calculated as follows:
 ```{r}
 d13C.disc <- (ATM.13C-TR13)/(1+TR13/1000)
@@ -182,8 +188,7 @@ ts.plot(ci/ca,ylab="ci/ca",xlab="Years", main=""); lines(ci.leaf/ca, col="#0B775
 Question 4: What differences do you observe between physiological indices at stem level and leaf level?
 
 
-The version of the Farquhar model we used above is a simplified description of the isotopic discrimination.
-It does not include the fractionation effects during the transfer of CO2 from substomatal cavities to the site of fixation via the mesophyll, and during mitochondrial respiration and photorespiration. While the mesophyll fractionation and their values remain highly unconstrained, recent studies have recommendedthe inclusion of the photorespiratory effect in the discrimination model as this term contributes to an increase of Δ13C with ca rise by 0.004‰ ppm-1 (Keeling et al., 2017; Lavergne et al., 2019).
+The version of the Farquhar model we used above is a simplified description of the isotopic discrimination. It does not include the fractionation effects during the transfer of CO2 from substomatal cavities to the site of fixation via the mesophyll, and during mitochondrial respiration and photorespiration. While the mesophyll fractionation and their values remain highly unconstrained, recent studies have recommendedthe inclusion of the photorespiratory effect in the discrimination model as this term contributes to an increase of Δ13C with ca rise by 0.004‰ ppm-1 (Keeling et al., 2017; Lavergne et al., 2019).
 
 
 A Farquhar model that includes the photorespiratory term is as follows:
@@ -202,7 +207,7 @@ Based on Notebook 1 and the temperature file, define the appropriate temperature
 ```{r}
 gridded.tt.data <- ts(read.table("CRU_TT.txt",header=T),start=1901,frequency=1)
 tt.JJA <- rowMeans(gridded.tt.data[,c(6,7,8)])
-tt.JJA <- ts(tt.Mar_Jun,start=1901,frequency =1)
+tt.JJA <- ts(tt.JJA ,start=1901,frequency =1)
 ```
 
 Calculate gamma star as follows:
