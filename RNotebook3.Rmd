@@ -11,7 +11,7 @@ The following code and comments should further your experience using tree ring a
 
 There are a few questions throughout to catalyze understanding and critical thinking. The analysis is broken into 4 main parts -including 20 questions, at the end you should have gone through many of the steps commonly used for reconstructing and interpreting iWUE derived from tree ring d13C. You will also be familiar with uncertainties related to such calculations and best practices to perform them.
 
-You will need to download the R project fromchttps://github.com/SBelmecheri/DISCO-Ntebook3.git and to set your own working directory. Once you open the Notebook 3.Rproj in R studio  you can open the Notebook 3.Rmd file to proceed with the activity.
+You will need to download the R project fromchttps://github.com/SBelmecheri/DISCO-Ntebook3.git and to set your own working directory. Once you open the Notebook 3.Rproj in R studio  you can open the Notebook3.Rmd file to proceed with the activity.
 
 ## PART 0: Setting up directories and files 
 
@@ -120,6 +120,8 @@ d13C.disc <- (ATM.13C-TR13)/(1+TR13/1000)
 ```
 And ci as follows:
 ```{r}
+a=4.4
+b=28
 ci <-  ca*(d13C.disc-a)/(b-a)
 ```
 And iwue as follows:
@@ -153,14 +155,14 @@ Upscaling d13C measurements from tree rings to the leaf level can significantly 
 
 We can scale tree ring d13 to leaf level using a factor d.
 
-d represents the sum of post-photosynthetic isotope fractionations between the leaf organic matter and the plant material considered. Choose the d value based on the studied material ( for this site, it is cellulose)
+d represents the sum of post-photosynthetic isotope fractionations between the leaf organic matter and the plant material considered. Choose the d value based on the studied material (for this site, it is cellulose)
 
 ```{r}
 d=1.9 # for d13C measured in wood
 d=2.1 # for d13C measured in cellulose
 ```
 
-This correction can be made as follows:
+This correction can be made as follows: * Choose the appropriate d factor for this site
 ```{r}
 d13C.disc.leaf <- (ATM.13C-(TR13-d))/(1+(TR13-d)/1000)
 ```
@@ -188,7 +190,7 @@ ts.plot(ci/ca,ylab="ci/ca",xlab="Years", main=""); lines(ci.leaf/ca, col="#0B775
 Question 4: What differences do you observe between physiological indices at stem level and leaf level?
 
 
-The version of the Farquhar model we used above is a simplified description of the isotopic discrimination. It does not include the fractionation effects during the transfer of CO2 from substomatal cavities to the site of fixation via the mesophyll, and during mitochondrial respiration and photorespiration. While the mesophyll fractionation and their values remain highly unconstrained, recent studies have recommendedthe inclusion of the photorespiratory effect in the discrimination model as this term contributes to an increase of Δ13C with ca rise by 0.004‰ ppm-1 (Keeling et al., 2017; Lavergne et al., 2019).
+The version of the Farquhar model we used above is a simplified description of the isotopic discrimination. It does not include the fractionation effects during the transfer of CO2 from substomatal cavities to the site of fixation via the mesophyll, and during mitochondrial respiration and photorespiration. While the mesophyll fractionation and their values remain highly unconstrained, recent studies have recommended the inclusion of the photorespiratory effect in the discrimination model as this term contributes to an increase of Δ13C with ca rise by 0.004‰ ppm-1 (Keeling et al., 2017; Lavergne et al., 2019).
 
 
 A Farquhar model that includes the photorespiratory term is as follows:
@@ -218,7 +220,8 @@ Gst <- calc_gammastar(tc, patm)
 
 And the photorespiratory term as follows:
 ```{r}
-photoresp_term <- 12*(Gst/ca) # ca is  in Pa
+f=12
+photoresp_term <- f*(Gst/ca) # ca is  in Pa
 ```
 Calculate ci to include photorespiration:
 ```{r}
@@ -231,7 +234,6 @@ iwue.leaf.photo <- (ca-ci.leaf.photo)/1.6
 
 Plot the leaf level physiological parameters using the simple and photorespiration models:
 ```{r}
-
 layout(matrix(1:6,nrow = 3, ncol = 2,byrow = F), widths = c(3,3,3),heights = c(3,3,3),respect = TRUE)
 # Note you might need to adjust the ylim values.
 ts.plot(TR13,ylab="d13C (permil.VPDB)",xlab="Years", main="OBSERVATIONS")
@@ -242,7 +244,6 @@ ts.plot(iwue.leaf,ylab=" iwue (umol/mol)",xlab="Years", main=""); lines(iwue.lea
 ts.plot(ci.leaf/ca,ylab="ci/ca",xlab="Years", main=""); lines(ci.leaf.photo/ca, col="#0B775E")
 legend("bottomleft",c("SIMPLE", "PHOTO"),lwd= c(1,1), bty = "n", col=c("black","#0B775E"),
        text.col=c("black","#0B775E"),ncol=1)
-
 ```
 
 Question 5: Do the trends and amplitude of interannual variability vary between the simple model
@@ -250,11 +251,11 @@ and the one including photorespiration?
 
 ## PART 4: interpreting iWUE and leaf gas exchange strategies 
 
-From the parts above, you have now calculated physiological parameters using best practices to account for most fractionation factors, using the most updated source data, and scaling to leaf level.
+From the parts above, you have now calculated physiological parameters using best practices to account for most fractionation factors, using the most updated source data, and scaling d13C measurements to leaf level.
 
-In the following, we are going to interpret variations of this physiological parameters. We will focus on those physiological parameters using the model with photorespiration.
+In the following, you will interpret variations of these physiological parameters. You will focus on those physiological parameters using the model with photorespiration.
 
-First, compute the trends of iWUE, ci and ci/ca over the period of record. you can use the lm function and the summary to look at and report the statistics (R2, p value). Here is a first example with iWUE:
+First, compute the trends of iWUE, ci and ci/ca over the period of record. You can use the lm function and the summary to look at- and report the statistics (R2, p value). Here is a first example with iWUE:
 ```{r}
 iwue.linear <- lm(iwue.leaf.photo ~ seq(1901,2002,by=1))
 summary(iwue.linear)
@@ -277,11 +278,12 @@ Question 7: How do you interpret the ci/ca trends in term of stomatal conductanc
 
 Question 8: Was the iWUE increase steady over time?
 
-Question 9: What was the rate of the ci (pa.year-1) increase over time? 
+Question 9: What was the rate of the ci (pa or ppm.year-1) increase over time? 
 
 Question 10: Was this rate steady/constant over time?
 
-Question 11: compared to the rate of ca, was the rate of ci: a) proportional   b) similar.To answer this question, you need to estimate the rate of ca using lm and summary functions.
+Question 11: compared to the rate of ca, was the rate of ci: a) proportional to ca   b) similar to ca.
+To answer this question, you need to estimate the rate of ca using lm and summary functions.
 
 Estimate the ci increase relative to ca. You can do this by regressing ci by ca.
 ```{r}
@@ -289,7 +291,7 @@ ci.linear <- lm(ci ~ ca)
 summary(ci.linear)
 ```
 
-Question 12: Report the rate and describe it in terms of a) proportional   b) similar. Note that this rate translate the ci increase for each ppm/pa of ca increase.
+Question 12: Report the rate of ci and describe it in terms of a) proportional   b) similar. Note that this rate translate the ci increase for each ppm/pa of ca increase.
 
 Question 13: Looking at all physiological indices, their trends and rates, how do you interpret the temporal variations of stomatal conductance and photosynthesis of these trees?
 
@@ -298,7 +300,7 @@ With rising ca, variations in plant Δ13C have been grouped into three leaf gas-
 
 (1) constant ci, (2) constant ci/ca, and (3) constant ca − ci. 
 
-The first two strategies are considered active, and the third passive. These theoretical considerations serve as the basis for the interpretation of the physiological mechanisms underlying iWUE trends.
+The first two strategies are considered active, and the third passive. These theoretical considerations serve as the basis for the interpretation of the physiological mechanisms underlying iWUE trends. Recently, a dynamic strategy has been described for low CO2 levels (<400 ppm) where trees switch between the 3 strategies described above.
 
 Calculate ci following scenario 1:
 ```{r}
@@ -330,9 +332,9 @@ legend("topleft",c("ci-observed", "ci constant","ci/ca constant","ca-ci constant
        text.col=c("black","#F2AD00","#F2AD00","#F2AD00"), ncol=1)
 ```
 
-Question 14: Does the observed ci (derived from tree rings) follow any of the 3 scenarios?
+Question 14: Does the observed ci (derived from tree rings) follow any of the 3 scenarios or a dynamic strategy?
 
-Question 15:   Does the observed ci follow a scenario consistently throughout the record?
+Question 15: Does the observed ci follow a scenario consistently throughout the record?
 
 Compute iwue following the three scenarios (using ci for 3 scenarios from above) and plot with observed iwue:
 ```{r}
@@ -349,7 +351,7 @@ Question 17: is it driven by an increase is photosynthetic assimilation?
 
 Question 18: is it driven by a decrease is stomatal conductance?
 
-Question 19: are iwue, photosynthetic assimilation,stomatal conductance driven by
+Question 19: are iwue, photosynthetic assimilation,stomatal conductance driven by:
 
  a) rising ca, b) trends in climate, c) both?
  
