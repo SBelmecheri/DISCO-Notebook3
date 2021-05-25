@@ -3,9 +3,11 @@ title: "Calculation and interpretation of physiological indices derived from tre
 output: html_notebook
 ---
 
-Isotope Dendrochronology
-Calculation and interpretation of physiological indices derived from tree ring d13C
-COURSE: DISC, LTRR, UNIVERSITY OF ARIZONA. INSTRUCTORS: S. BELMECHERI & P. SZEJNER
+#### Isotope Dendrochronology
+#### Calculation and interpretation of physiological indices derived from tree ring d13C
+#### COURSE: DISC, LTRR, UNIVERSITY OF ARIZONA. INSTRUCTORS: S. BELMECHERI & P. SZEJNER
+
+### Instructions  
 
 The following code and comments should further your experience using tree ring and atmospheric d13C data to calculate WUE and other physiological indices. This exercise relies upon raw tree-ring d13C measurements, atmospheric d13C measurements, and uses the photosythesis biochemical model of Farqhuar 1982.
 
