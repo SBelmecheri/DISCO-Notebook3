@@ -7,13 +7,7 @@ output: html_notebook
 ##### Isotope Dendrochronology
 ##### Calculation and interpretation of physiological indices derived from tree ring d13C
 ##### COURSE: DISC, LTRR, UNIVERSITY OF ARIZONA. INSTRUCTORS: S. BELMECHERI & P. SZEJNER
-=======
-#### Isotope Dendrochronology
-#### Calculation and interpretation of physiological indices derived from tree ring d13C
-#### COURSE: DISC, LTRR, UNIVERSITY OF ARIZONA. INSTRUCTORS: S. BELMECHERI & P. SZEJNER
 
-### Instructions  
->>>>>>> f83b010fe54f90fe4e5b11d5d3bb33b36ce83d24
 
 ### Instructions
 
