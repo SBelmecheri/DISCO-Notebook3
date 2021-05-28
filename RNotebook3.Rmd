@@ -139,22 +139,21 @@ ts.plot(iwue,ylab=" iwue (umol/mol)",xlab="Years", main="")
 ts.plot(ci/ca,ylab="ci/ca",xlab="Years", main="")
 
 ```
-Question 2: Describe the trends of the various physiological indices.
+Question 2: describe the trends of the various physiological indices.
 
-Question 3: Based on what you have learned in the Isotope theory lectures, describe the trees'physiological response over time at this site.
-
+Question 3: based on what you have learned in the Isotope theory lectures, describe the tree's physiological response over time at this site.
 
 ## PART 3: Calculating iWUE- COMPREHENSIVE APPROACH 
 
-In the Farquhar model, the d13C is the isotopic ratio for sugars fixed in the leaf. For tree-ring cellulose, a correction factor is used to account for the offset of d13C between leaf sugars and tree-ring cellulose. The offset results from post-photosynthetic fractionation processes (Gessler et al., 2014). 
+In the Farquhar et al. model, the d13C is the isotopic ratio for sugars fixed in the leaf. For tree-ring cellulose, a correction factor accounts for the offset of d13C between leaf sugars and tree-ring cellulose. The offset results from post-photosynthetic fractionation processes (Gessler et al., 2014). 
 
 The offset between whole wood and leaves is ~1.3 ± 0.2‰ for oak and conifer species. Additional isotopic offsets include the difference between tree-ring cellulose and bulk wood with an average value of ~1.3 ± 0.2‰, and isotopic depletion between primary assimilates and bulk leaf with values of -0.5 ± 1‰. 
 
-Upscaling d13C measurements from tree rings to the leaf level can significantly improve estimates of Δ13C and hence reduce uncertainties in the determination of the ratio of ci to ca.
+Upscaling d13C measurements from tree rings to the leaf level can significantly improve estimates of Δ13C and reduce uncertainties (offsets) in determining the ratio of ci to ca.
 
-We can scale tree ring d13 to leaf level using a factor d.
+We can scale tree ring d13 to leaf level using a factor `d`.
 
-d represents the sum of post-photosynthetic isotope fractionations between the leaf organic matter and the plant material considered. Choose the d value based on the studied material (for this site, it is cellulose)
+`d` represents the sum of post-photosynthetic isotope fractionations between the organic leaf matter and the plant material considered. Choose the d value based on the studied material (for this site, it is cellulose)
 
 ```{r}
 d=1.9 # for d13C measured in wood
@@ -166,25 +165,31 @@ This correction can be made as follows: * Choose the appropriate d factor for th
 d13C.disc.leaf <- (ATM.13C-(TR13-d))/(1+(TR13-d)/1000)
 ```
 
-Leaf level ci can be calculated as follows:
+Leaf level ci `ci.leaf` can be calculated as follows:
 ```{r}
 ci.leaf <-  ca*(d13C.disc.leaf-a)/(b-a)
 ```
 
-Leaf level iwue can be calculated as follows:
+Leaf level intrinsic water use efficiency  `iwue.leaf` can be calculated as follows:
 ```{r}
 iwue.leaf <- (ca-ci.leaf)/1.6
 ```
 now add the leaf level physiological indices to the previous plot:
 ```{r}
-layout(matrix(1:6,nrow = 3, ncol = 2,byrow = F), widths = c(3,3,3),heights = c(3,3,3),respect = TRUE)
+layout(matrix(1:6,nrow = 3, ncol = 2,byrow = F), widths = c(4,4),heights = c(2,2,2),respect = TRUE)
+par(mar=c(4,5,2,0.1))
 # Note you might need to adjust the ylim values.
-ts.plot(TR13,ylab="d13C (permil.VPDB)",xlab="Years", main="OBSERVATIONS")
-ts.plot(d13C.disc,ylab="D13C (permil.VPDB)",xlab="Years", main=""); lines(d13C.disc.leaf, col="#0B775E")
-ts.plot(ca,ylab="CO2 (ppm)",xlab="Years", main="")
-ts.plot(ci,ylab="ci (pa)",xlab="Years", main="FARQUHAR-MODEL"); lines(ci.leaf, col="#0B775E")
-ts.plot(iwue,ylab=" iwue (umol/mol)",xlab="Years", main=""); lines(iwue.leaf, col="#0B775E")
-ts.plot(ci/ca,ylab="ci/ca",xlab="Years", main=""); lines(ci.leaf/ca, col="#0B775E")
+
+plot(TR13,ylab="d13C (permil.VPDB)",xlab="Years", main="OBSERVATIONS")
+plot(d13C.disc,ylab="D13C (permil.VPDB)",xlab="Years", main="", ylim=c(range(c(d13C.disc.leaf,d13C.disc))))
+        lines(d13C.disc.leaf, col="#0B775E", )
+plot(ca,ylab="CO2 (ppm)",xlab="Years", main="")
+plot(ci,ylab="ci (pa)",xlab="Years", main="FARQUHAR-MODEL",ylim=c(range(c(ci, ci.leaf))))
+        lines(ci.leaf, col="#0B775E")
+plot(iwue,ylab=" iwue (umol/mol)",xlab="Years", main="",ylim=c(range(c(iwue, iwue.leaf))))
+        lines(iwue.leaf, col="#0B775E")
+plot(ci/ca,ylab="ci/ca",xlab="Years", main="", ylim=c(range(c(ci/ca, ci.leaf/ca))))
+        lines(ci.leaf/ca, col="#0B775E")
 ```
 Question 4: What differences do you observe between physiological indices at stem level and leaf level?
 
