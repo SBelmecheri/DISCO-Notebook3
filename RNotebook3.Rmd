@@ -3,7 +3,7 @@ title: "Calculation and interpretation of physiological indices derived from tre
 output: html_notebook
 ---
 
-<<<<<<< HEAD
+
 ##### Isotope Dendrochronology
 ##### Calculation and interpretation of physiological indices derived from tree ring d13C
 ##### COURSE: DISC, LTRR, UNIVERSITY OF ARIZONA. INSTRUCTORS: S. BELMECHERI & P. SZEJNER
@@ -69,13 +69,15 @@ Question 1: Compare both trends. Describe and interpret the relationship between
 
 ## PART 2: Calculating iWUE- SIMPLE APPROACH 
 
-The Farquhar 1982 biochemical model describes the isotopic discrimination against 13C (Δ13C) during carbon diffusion and fixation by plants. The Farquhar equation can be written as follows:
+The Farquhar, O'Leary, and Berry 1982 biochemical model describes the isotopic discrimination against 13C (Δ13C) during carbon diffusion and fixation by plants. The Farquhar et al. equation can be written as follows:
 
 Δ13C = a+(b-a)*(ci/ca)
 
-a=4.4 is the fractionation due to CO2 diffusion in air through the stomata.
+where:  
 
-b= 28 is the apparent net fractionation by RuBisCO during carboxylation.
+a=4.4‰ is the fractionation due to CO2 diffusion in air through the stomata.
+
+b= 28‰ is the apparent net fractionation by RuBisCO during carboxylation.
 
 ci and ca are are the leaf intercellular and ambient partial pressure of CO2 (Pa), respectively.
 
@@ -83,52 +85,52 @@ From the equation above, ci can be calculated as follows:
 
 ci =  ca*(Δ13C-a)/(b-a)
 
-We know ca from measurements.ca is in ppm. You can use ca in ppm such as:
+We know `ca` from measurements. `ca` is in ppm. You can use `ca` in ppm such as:
 ```{r}
 # We know ca from measurements.ca is in ppm. you use use it as is 
 ca <- ATM.CO2 # in ppm
 ```
-Or use ca in Pa as follows:
+Or use `ca` in Pa as follows:
 ```{r}
 # you need  r package "rpmodel"
 library("rpmodel")
 ```
-and the function calc_patm {rpmodel} to calculate atmospheric pressure at sea level. The variable needed is elevation.
+and the function `calc_patm {rpmodel}` to calculate atmospheric pressure at sea level. The variable needed is elevation.
 ```{r}
 elv= 1600 # Elevation above sea-level (m.a.s.l.)
 patm<- calc_patm(elv, patm0 = 101325)
 ```
-calculate ca as follows:
+calculate `ca` as follows:
 ```{r}
 ca <- ( 1.e-6 ) * ca * patm  # in Pa
 ```
-convert ca to a time series:
+convert `ca` to a time series:
 ```{r}
 ca <- ts(ca, start=1901, frequency=1)
 ```
 
 WARNING *********
-Make sure you selected a ca in ppm or pa (by commenting the one you discard)
+Make sure you selected a `ca` in ppm or pa (by commenting the one you discard)
 WARNING *********
 
-Δ13C can then be calculated as follows:
+Δ13C (`d13C.disc`) can then be calculated as follows:
 ```{r}
 d13C.disc <- (ATM.13C-TR13)/(1+TR13/1000)
 ```
-And ci as follows:
+And `ci` as follows:
 ```{r}
 a=4.4
 b=28
 ci <-  ca*(d13C.disc-a)/(b-a)
 ```
-And iwue as follows:
+And the itrinsic water use efficiency`iwue` as follows:
 ```{r}
 iwue <- (ca-ci)/1.6
 ```
 plot the physiological indices:
 ```{r}
-layout(matrix(1:6,nrow = 3, ncol = 2,byrow = F), widths = c(3,3,3),heights = c(3,3,3),respect = TRUE)
-
+layout(matrix(1:6,nrow = 3, ncol = 2,byrow = F), widths = c(4,4),heights = c(2,2,2),respect = TRUE)
+par(mar=c(4,5,2,0.1))
 ts.plot(TR13,ylab="d13C (permil.VPDB)",xlab="Years", main="OBSERVATIONS")
 ts.plot(d13C.disc,ylab="D13C (permil.VPDB)",xlab="Years", main="")
 ts.plot(ca,ylab="CO2 (pa)",xlab="Years", main="")
