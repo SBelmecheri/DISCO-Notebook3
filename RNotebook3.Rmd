@@ -191,7 +191,7 @@ plot(iwue,ylab=" iwue (umol/mol)",xlab="Years", main="",ylim=c(range(c(iwue, iwu
 plot(ci/ca,ylab="ci/ca",xlab="Years", main="", ylim=c(range(c(ci/ca, ci.leaf/ca))))
         lines(ci.leaf/ca, col="#0B775E")
 ```
-Question 4: What differences do you observe between physiological indices at stem level and leaf level?
+Question 4: what differences do you observe between physiological indices at stem level and leaf level?
 
 
 The version of the Farquhar model we used above is a simplified description of the isotopic discrimination. It does not include the fractionation effects during the transfer of CO2 from substomatal cavities to the site of fixation via the mesophyll, and during mitochondrial respiration and photorespiration. While the mesophyll fractionation and their values remain highly unconstrained, recent studies have recommended the inclusion of the photorespiratory effect in the discrimination model as this term contributes to an increase of Δ13C with ca rise by 0.004‰ ppm-1 (Keeling et al., 2017; Lavergne et al., 2019).
@@ -209,22 +209,22 @@ Gst (or Γ*, Gamma Star) is the CO2 compensation point in the absence of mitocho
 
 
 
-Based on Notebook 1 and the temperature file, define the appropriate temperature window (e.g.average growing season). This has to be a Time series of site level temperature variability during the summer or growing season or relevant season for trees at this site. Below is an example for summer (June-July-August):
+Based on `Notebook 1` and the temperature file, define the appropriate temperature window (e.g.average growing season). This has to be a Time series of site level temperature variability during the summer or growing season or relevant season for trees at this site. Below is an example for summer (June-July-August):
 ```{r}
 gridded.tt.data <- ts(read.table("CRU_TT.txt",header=T),start=1901,frequency=1)
 tt.JJA <- rowMeans(gridded.tt.data[,c(6,7,8)])
 tt.JJA <- ts(tt.JJA ,start=1901,frequency =1)
 ```
 
-Calculate gamma star as follows:
+Calculate gamma star `Gst` as follows:
 ```{r}
 tc <- tt.JJA # and patm has been defined earlier.
 Gst <- calc_gammastar(tc, patm)
 ```
 
-And the photorespiratory term as follows:
+And the photorespiratory term `photoresp_term` as follows:
 ```{r}
-f=12
+f=12 #The fractionation due to photorespiration
 photoresp_term <- f*(Gst/ca) # ca is  in Pa
 ```
 Calculate ci to include photorespiration:
@@ -238,14 +238,19 @@ iwue.leaf.photo <- (ca-ci.leaf.photo)/1.6
 
 Plot the leaf level physiological parameters using the simple and photorespiration models:
 ```{r}
-layout(matrix(1:6,nrow = 3, ncol = 2,byrow = F), widths = c(3,3,3),heights = c(3,3,3),respect = TRUE)
+layout(matrix(1:6,nrow = 3, ncol = 2,byrow = F), widths = c(4,4),heights = c(2,2,2),respect = TRUE)
+par(mar=c(4,5,2,0.1))
 # Note you might need to adjust the ylim values.
-ts.plot(TR13,ylab="d13C (permil.VPDB)",xlab="Years", main="OBSERVATIONS")
-ts.plot(d13C.disc.leaf,ylab="D13C (permil.VPDB)",xlab="Years", main="")
-ts.plot(ca,ylab="CO2 (pa)",xlab="Years", main="")
-ts.plot(ci.leaf,ylab="ci (pa)",xlab="Years", main="FARQUHAR_MODEL"); lines(ci.leaf.photo, col="#0B775E")
-ts.plot(iwue.leaf,ylab=" iwue (umol/mol)",xlab="Years", main=""); lines(iwue.leaf.photo, col="#0B775E")
-ts.plot(ci.leaf/ca,ylab="ci/ca",xlab="Years", main=""); lines(ci.leaf.photo/ca, col="#0B775E")
+plot(TR13,ylab="d13C (permil.VPDB)",xlab="Years", main="OBSERVATIONS")
+plot(d13C.disc.leaf,ylab="D13C (permil.VPDB)",xlab="Years", main="")
+plot(ca,ylab="CO2 (pa)",xlab="Years", main="")
+plot(ci.leaf,ylab="ci (pa)",xlab="Years", main="FARQUHAR_MODEL",ylim=c(range(c(ci.leaf, ci.leaf.photo))))
+        lines(ci.leaf.photo, col="#0B775E")
+plot(iwue.leaf,ylab=" iwue (umol/mol)",xlab="Years", main="",ylim=c(range(c(iwue.leaf, iwue.leaf.photo))))
+        lines(iwue.leaf.photo, col="#0B775E")
+plot(ci.leaf/ca,ylab="ci/ca",xlab="Years", main="",ylim=c(range(c(ci/ca, ci.leaf.photo/ca))))
+        lines(ci.leaf.photo/ca, col="#0B775E")
+
 legend("bottomleft",c("SIMPLE", "PHOTO"),lwd= c(1,1), bty = "n", col=c("black","#0B775E"),
        text.col=c("black","#0B775E"),ncol=1)
 ```
