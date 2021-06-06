@@ -5,7 +5,6 @@ output: html_notebook
 
 
 ##### Isotope Dendrochronology
-##### Calculation and interpretation of physiological indices derived from tree ring d13C
 ##### COURSE: DISC, LTRR, UNIVERSITY OF ARIZONA. INSTRUCTORS: S. BELMECHERI & P. SZEJNER
 
 
@@ -13,27 +12,32 @@ output: html_notebook
 
 The following code and comments should further your experience using tree ring and atmospheric d13C data to calculate WUE and other physiological indices. This exercise relies upon raw tree-ring d13C measurements, atmospheric d13C measurements and uses the photosynthesis biochemical model of Farqhuar 1982.
 
-There are a few questions throughout to catalyze understanding and critical thinking. The analysis is broken into four main parts -including 20 questions. At the end, you should have gone through many of the steps commonly used for reconstructing and interpreting iWUE derived from tree ring d13C. You will also be familiar with uncertainties related to such calculations and best practices to perform them.
+There are a few questions throughout to catalyze understanding and critical thinking. The analysis is broken into four main parts (including 20 questions). At the end, you should have gone through many of the steps commonly used for reconstructing and interpreting iWUE derived from tree ring d13C. You will also be familiar with uncertainties related to such calculations and best practices to perform them.
 
-You will need to download the R project from https://github.com/SBelmecheri/DISCO-Ntebook3.git and set your own working directory. Once you open the Notebook 3.Rproj in R studio you can open the Notebook3.Rmd file to proceed with the activity.
+You will need to download the R project from https://github.com/SBelmecheri/DISCO-Ntebook3.git and set your own working directory. Once you open the Notebook 3.Rproj in R studio you can open the Notebook3.Rmd file to proceed with the exercise.
 
 ## PART 0: Setting up directories and files 
 
-You will need the three following files in one directory provided with the R project for the following exercises.  
+You will need the three following files in one directory:  
 
-1. Tree-ring d13C measurements. The filename is ```"LIL.txt"```  
+1. Tree-ring d13C measurements. The filename is ```"LIL.txt"```    
 
-2. Atmospheric 13C and [CO2] data. The filename is```"ATM.txt"```  
+2. Atmospheric 13C and [CO2] data. The filename is```"ATM.txt"```    
 
-3. Regional temperature data. The filename is ```"CRU_TT.txt" ```
+3. Regional temperature data. The filename is ```"CRU_TT.txt" ```  
  
-You will also need to install and load the ```dplR``` and  ```rpmodel``` packages:
+You will also need to install and load the ```dplR``` and  ```rpmodel``` packages:  
 ```{r}
 library(dplR)
 library(rpmodel)
 ```
 
 You should see the above file names (and anything else in this directory) when you type (or copy and paste) the following line:
+
+```{r}
+list.files()
+```
+
 ```{r}
 list.files()
 ```
