@@ -127,7 +127,7 @@ a=4.4
 b=28
 ci <-  ca*(d13C.disc-a)/(b-a)
 ```
-And the itrinsic water use efficiency`iwue` as follows:
+And the intrinsic water use efficiency`iwue` as follows:
 ```{r}
 iwue <- (ca-ci)/1.6
 ```
