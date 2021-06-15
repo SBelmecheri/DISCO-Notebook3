@@ -31,7 +31,6 @@ You will need the three following files in one directory:
  
 You will also need to install and load the ```dplR``` and  ```rpmodel``` packages:  
 ```{r}
-library(dplR)
 library(rpmodel)
 ```
 
