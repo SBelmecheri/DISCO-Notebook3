@@ -29,7 +29,7 @@ You will need the three following files in one directory:
 
 3. Regional temperature data. The filename is ```"CRU_TT.txt" ```  
  
-You will also need to install and load the ```dplR``` and  ```rpmodel``` packages:  
+You will also need to install ```rpmodel``` packages:  
 ```{r}
 library(rpmodel)
 ```
@@ -61,7 +61,7 @@ ATM.13C <- ATM[,"atm13C"]
 ATM.CO2 <- ATM[,"atmCO2"]
 ```
 
-Plot the atmospheric data (```ATM.13C``` and ```ATM.CO2```) datasets:
+Plot the atmospheric data (```ATM.13C``` and ```ATM.CO2```) dataset:
 ```{r}
 layout(matrix(1:2,nrow = 1, ncol = 2,byrow = T), widths = c(3,3),heights = c(3,3),respect = TRUE)
 ts.plot(ATM.13C,ylab="d13C (permil.VPDB)",xlab="Years", col="#9C964A",main="d13C")
@@ -102,7 +102,7 @@ library("rpmodel")
 and the function `calc_patm {rpmodel}` to calculate atmospheric pressure at sea level as function of elevation (site elevation).
 ```{r}
 elv= 1600 # Elevation above sea-level (m.a.s.l.)
-patm<- calc_patm(elv, patm0 = 101325)
+patm <- calc_patm(elv, patm0 = 101325)
 ```
 calculate `ca` as follows:
 ```{r}
