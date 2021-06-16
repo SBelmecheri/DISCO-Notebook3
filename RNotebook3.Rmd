@@ -99,14 +99,14 @@ Or use `ca` in Pa as follows:
 # you need  r package "rpmodel"
 library("rpmodel")
 ```
-and the function `patm {rpmodel}` to calculate atmospheric pressure at sea level as function of elevation (site elevation).
+and the function `patm__lil {rpmodel}` to calculate atmospheric pressure at sea level as function of elevation (site elevation).
 ```{r}
 elv= 1600 # Elevation above sea-level (m.a.s.l.)
-patm <- calc_patm(elv, patm0 = 101325)
+patm_lil <- patm(elv, patm0 = 101325)
 ```
 calculate `ca` as follows:
 ```{r}
-ca <- ( 1.e-6 ) * ca * patm  # in Pa
+ca <- ( 1.e-6 ) * ca * patm_lil  # in Pa
 ```
 convert `ca` to a time series:
 ```{r}
@@ -208,7 +208,7 @@ The photorespiratory term is the: f*(Gst/ca)
 
 The fractionation due to photorespiration, f, is 12 permil. 
 
-Gst (or Γ*, Gamma Star) is the CO2 compensation point in the absence of mitochondrial respiration (Pa), it is calculated from the temperature (T) and atmospheric pressure response.You can use the gammastar(tc, patm) function from the rpmodel to calculate Gamma Star.
+Gst (or Γ*, Gamma Star) is the CO2 compensation point in the absence of mitochondrial respiration (Pa), it is calculated from the temperature (T) and atmospheric pressure response.You can use the gammastar(tc, patm_lil) function from the rpmodel to calculate Gamma Star.
 
 
 
@@ -221,8 +221,8 @@ tt.JA <- ts(tt.JA ,start=1901,frequency =1)
 
 Calculate gamma star `Gst` as follows:
 ```{r}
-tc <- tt.JA # and patm has been defined earlier.
-Gst <- gammastar(tc, patm)
+tc <- tt.JA # and patm_lil has been defined earlier.
+Gst <- gammastar(tc, patm_lil)
 ```
 
 And the photorespiratory term `photoresp_term` as follows:
@@ -302,7 +302,7 @@ Question 8: Was the iWUE,ci ot ci/ca increase steady over time?
 To answer the following questions, you need to convert the ci from pa to ppm
 ```{r}
 
-ci.leaf.photo.ppm <- ci.leaf.photo /(( 1.e-6 ) * patm)
+ci.leaf.photo.ppm <- ci.leaf.photo /(( 1.e-6 ) * patm_lil)
 
 #convert to a time series
 ci.leaf.photo.ppm <- ts(ci.leaf.photo.ppm, start=1901, frequency = 1)
