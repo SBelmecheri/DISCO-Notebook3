@@ -102,7 +102,7 @@ library("rpmodel")
 and the function `patm {rpmodel}` to calculate atmospheric pressure at sea level as function of elevation (site elevation).
 ```{r}
 elv= 1600 # Elevation above sea-level (m.a.s.l.)
-patm <- patm(elv, patm0 = 101325)
+patm <- calc_patm(elv, patm0 = 101325)
 ```
 calculate `ca` as follows:
 ```{r}
@@ -216,7 +216,7 @@ The temperature temporal window that will be used will be  (July-August):
 ```{r}
 gridded.tt.data <- ts(read.table("CRU_TT.txt",header=T),start=1901,frequency=1)
 tt.JA <- rowMeans(gridded.tt.data[,c(7,8)])
-tt.JA <- ts(tt.JJA ,start=1901,frequency =1)
+tt.JA <- ts(tt.JA ,start=1901,frequency =1)
 ```
 
 Calculate gamma star `Gst` as follows:
