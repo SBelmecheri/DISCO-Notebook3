@@ -274,10 +274,10 @@ summary(iwue.linear)
 ```
 Repeat these steps for ci and ci/ca (you can copy lines 274 and 275 and replace iwue by ci and ci/ca):
 ```{r}
-# ci.linear <- 
-#summary(ci.linear)
-# ci.ca.linear <- 
-#summary(ci.ca.linear)
+ci.linear <- lm(ci.leaf.photo ~ seq(1901,2002,by=1))
+summary(ci.linear)
+ci.ca.linear <- lm(ci.leaf.photo/ca ~ seq(1901,2002,by=1))
+summary(ci.ca.linear)
 ```
 Plot time-series of iWUE, ci and ci/ca and add the linear trend. Here is a first example with iWUE linear trend. You need to add the linear trend for ci and ci/ca:
 ```{r}
@@ -286,9 +286,11 @@ ts.plot(iwue.leaf.photo,ylab=" iwue (umol/mol)",xlab="Years", main="")
 abline(iwue.linear, col="#0B775E",lwd=2,lty=3)
 
 ts.plot(ci.leaf.photo,ylab=" ci(pa)",xlab="Years", main="") 
+abline(ci.linear, col="#0B775E",lwd=2,lty=3)
 # add linear trend
 
-ts.plot(ci.leaf/ca,ylab="ci/ca",xlab="Years", main="") 
+ts.plot(ci.leaf.photo/ca,ylab="ci/ca",xlab="Years", main="") 
+abline(ci.ca.linear, col="#0B775E",lwd=2,lty=3)
 # add linear trend
 
 ```
