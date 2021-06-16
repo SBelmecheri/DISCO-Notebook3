@@ -6,7 +6,6 @@ output:
   html_notebook: default
 ---
 
-
 ##### Isotope Dendrochronology
 ##### COURSE: DISC, LTRR, UNIVERSITY OF ARIZONA. INSTRUCTORS: S. BELMECHERI & P. SZEJNER
 
@@ -18,6 +17,8 @@ The following code and comments should further your experience using tree ring a
 There are a few questions throughout to catalyze understanding and critical thinking. The analysis is broken into four main parts (including 20 questions). At the end, you should have gone through many of the steps commonly used for reconstructing and interpreting iWUE derived from tree ring d13C. You will also be familiar with uncertainties related to such calculations and best practices to perform them.
 
 You will need to download the R project from https://github.com/SBelmecheri/DISCO-Ntebook3.git and set your own working directory. Once you open the Notebook 3.Rproj in R studio you can open the Notebook3.Rmd file to proceed with the exercise.
+
+The 13C Time serie analyzed here is the same as Norebook 1. For this site the 13C was measured on alpha cellulose.
 
 ## PART 0: Setting up directories and files 
 
@@ -75,7 +76,7 @@ Question 1: Compare both trends. Describe and interpret the relationship between
 
 The Farquhar, O'Leary, and Berry 1982 biochemical model describes the isotopic discrimination against 13C (Δ13C) during carbon diffusion and fixation by plants. The Farquhar et al. equation can be written as follows:
 
-Δ13C = a+(b-a)*(ci/ca)
+Δ13C = a+(b-a)*(ci/ca)  EQ1
 
 where:  
 
@@ -85,9 +86,9 @@ b= 28‰ is the apparent net fractionation by RuBisCO during carboxylation.
 
 ci and ca are are the leaf intercellular and ambient partial pressure of CO2 (Pa), respectively.
 
-From the equation above, ci can be calculated as follows:
+From the equation above EQ1, ci can be calculated as follows:
 
-ci =  ca*(Δ13C-a)/(b-a)
+ci =  ca*(Δ13C-a)/(b-a) EQ2
 
 We know `ca` from measurements. `ca` is in ppm. You can use `ca` in ppm as follows:
 ```{r}
@@ -99,10 +100,10 @@ Or use `ca` in Pa as follows:
 # you need  r package "rpmodel"
 library("rpmodel")
 ```
-and the function `calc_patm {rpmodel}` to calculate atmospheric pressure at sea level as function of elevation (site elevation).
+and the function `patm {rpmodel}` to calculate atmospheric pressure at sea level as function of elevation (site elevation).
 ```{r}
 elv= 1600 # Elevation above sea-level (m.a.s.l.)
-patm <- calc_patm(elv, patm0 = 101325)
+patm <- patm(elv, patm0 = 101325)
 ```
 calculate `ca` as follows:
 ```{r}
@@ -113,9 +114,6 @@ convert `ca` to a time series:
 ca <- ts(ca, start=1901, frequency=1)
 ```
 
-WARNING *********
-Make sure you selected a `ca` in ppm or pa (by commenting the one you discard)
-WARNING *********
 
 Δ13C (`d13C.disc`) can then be calculated as follows:
 ```{r}
@@ -160,11 +158,13 @@ We can scale tree ring d13 to leaf level using a factor `d`.
 `d` represents the sum of post-photosynthetic isotope fractionations between the organic leaf matter and the plant material considered. Choose the d value based on the studied material (for this site, it is cellulose)
 
 ```{r}
+# WARNING** Choose the appropriate d factor for this site** 
+# You can do this by discarding the d factor that does not correspond to the material analyzed at this site.
 d=1.9 # for d13C measured in wood
 d=2.1 # for d13C measured in cellulose
 ```
 
-This correction can be made as follows: WARNING** Choose the appropriate d factor for this site**
+This correction can be made as follows: 
 ```{r}
 d13C.disc.leaf <- (ATM.13C-(TR13-d))/(1+(TR13-d)/1000)
 ```
@@ -209,21 +209,21 @@ The photorespiratory term is the: f*(Gst/ca)
 
 The fractionation due to photorespiration, f, is 12 permil. 
 
-Gst (or Γ*, Gamma Star) is the CO2 compensation point in the absence of mitochondrial respiration (Pa), it is calculated from the temperature (T) and atmospheric pressure response.You can use the calc_gammastar(tc, patm) function from the rpmodel to calculate Gamma Star
+Gst (or Γ*, Gamma Star) is the CO2 compensation point in the absence of mitochondrial respiration (Pa), it is calculated from the temperature (T) and atmospheric pressure response.You can use the gammastar(tc, patm) function from the rpmodel to calculate Gamma Star.
 
 
 
-Based on `Notebook 1` and the temperature file, define the appropriate temperature window (e.g.average growing season). This has to be a Time series of site level temperature variability during the summer or growing season or relevant season for trees at this site. Below is an example for summer (June-July-August):
+The temperature temporal window that will be used will be  (July-August):
 ```{r}
 gridded.tt.data <- ts(read.table("CRU_TT.txt",header=T),start=1901,frequency=1)
-tt.JJA <- rowMeans(gridded.tt.data[,c(6,7,8)])
-tt.JJA <- ts(tt.JJA ,start=1901,frequency =1)
+tt.JA <- rowMeans(gridded.tt.data[,c(7,8)])
+tt.JA <- ts(tt.JJA ,start=1901,frequency =1)
 ```
 
 Calculate gamma star `Gst` as follows:
 ```{r}
-tc <- tt.JJA # and patm has been defined earlier.
-Gst <- calc_gammastar(tc, patm)
+tc <- tt.JA # and patm has been defined earlier.
+Gst <- gammastar(tc, patm)
 ```
 
 And the photorespiratory term `photoresp_term` as follows:
@@ -273,15 +273,24 @@ First, compute the trends of iWUE, ci and ci/ca over the period of record. You c
 iwue.linear <- lm(iwue.leaf.photo ~ seq(1901,2002,by=1))
 summary(iwue.linear)
 ```
-Repeat these steps for ci and ci/ca:
+Repeat these steps for ci and ci/ca (you can copy lines 274 and 275 and replace iwue by ci and ci/ca):
 ```{r}
 # ci.linear <- 
+#summary(ci.linear)
+# ci.ca.linear <- 
+#summary(ci.ca.linear)
 ```
-Plot time-series of iWUE, ci and ci/ca and add the linear trend. Here is a first example with iWUE. You can use the layout to have 3 plots:
+Plot time-series of iWUE, ci and ci/ca and add the linear trend. Here is a first example with iWUE linear trend. You need to add the linear trend for ci and ci/ca:
 ```{r}
 layout(matrix(1:3,nrow = 1, ncol = 3,byrow = T), widths = c(3,3,3),heights = c(3,3,3),respect = TRUE)
 ts.plot(iwue.leaf.photo,ylab=" iwue (umol/mol)",xlab="Years", main="") 
 abline(iwue.linear, col="#0B775E",lwd=2,lty=3)
+
+ts.plot(ci.leaf.photo,ylab=" ci(pa)",xlab="Years", main="") 
+# add linear trend
+
+ts.plot(ci.leaf/ca,ylab="ci/ca",xlab="Years", main="") 
+# add linear trend
 
 ```
 
@@ -289,9 +298,26 @@ Question 6: Using computed statistics above, Describe the trends and their signi
 
 Question 7: How do you interpret the ci/ca trends in term of stomatal conductance? 
 
-Question 8: Was the iWUE increase steady over time?
+Question 8: Was the iWUE,ci ot ci/ca increase steady over time?
 
-Question 9: What was the rate of the ci (pa or ppm.year-1) increase over time? 
+To answer the following questions, you need to convert the ci from pa to ppm
+```{r}
+
+ci.leaf.photo.ppm <- ci.leaf.photo /(( 1.e-6 ) * patm)
+
+#convert to a time series
+ci.leaf.photo.ppm <- ts(ci.leaf.photo.ppm, start=1901, frequency = 1)
+
+# rename the column to something nicer
+colnames(ci.leaf.photo.ppm) <- "ci.leaf.photo.ppm" 
+```
+You also need to use ca in ppm
+```{r}
+ca.ppm <- ATM.CO2
+```
+
+
+Question 9: What was the rate of the ci (ppm.year-1) increase over time? 
 
 Question 10: Was this rate steady/constant over time?
 
@@ -303,11 +329,13 @@ To answer this question, you need to estimate the rate of ca using ```lm``` and 
 
 Estimate the ci increase relative to ca. You can do this by regressing ci by ca.
 ```{r}
-ci.linear <- lm(ci ~ ca)
-summary(ci.linear)
+ci.rate <- lm(ci.leaf.photo.ppm ~ ca.ppm)
+summary(ci.rate)
 ```
 
-Question 12: Report the rate of ci and describe it in terms of a) proportional   b) similar. Note that this rate translate the ci increase for each ppm/pa of ca increase.
+Question 12: Report the rate of ci and describe it in terms of a) proportional   b) similar. Note that this rate translate the ci increase for each ppm of ca increase.
+
+Note: the rate of ci can be found in the coefficient section of the output of the lm function above.
 
 Question 13: Looking at all physiological indices, their trends and rates, how do you interpret the temporal variations of stomatal conductance and photosynthesis of these trees?
 
@@ -320,48 +348,45 @@ With rising ca, variations in plant Δ13C have been grouped into three leaf gas-
 
 The first two strategies are considered active, and the third passive. These theoretical considerations serve as the basis for the interpretation of the physiological mechanisms underlying iWUE trends. Recently, a dynamic strategy has been described for low CO2 levels (<400 ppm) where trees switch between the 3 strategies described above.
 
+Note, we will use the ca and ci in ppm to facilitate discussion.
+
 #### Calculate ci following scenario 1:
 ```{r}
 # first, estimate the average ci from tree ring for the first decade of the record
-ci.average_1decade <- mean(ci.leaf.photo[1:10])
+ci.average_1decade <- mean(ci.leaf.photo.ppm[1:10])
 ci.scenario1 <- ts(rep(ci.average_1decade, 102), start=1901, frequency=1)
 ```
 #### Calculate ci following scenario 2:
 ```{r}
 # first, estimate the average ci/ca from tree ring for the first decade of the record
-cica.average_1decade <- mean((ci.leaf.photo/ca)[1:10])
-ci.scenario2 <-ca*cica.average_1decade
+cica.average_1decade <- mean((ci.leaf.photo.ppm/ca.ppm)[1:10])
+ci.scenario2 <-ca.ppm*cica.average_1decade
 ```
 #### Calculate ci following scenario 3:
 ```{r}
 # first, estimate the average ca-ci from tree ring for the first decade of the record
-caci.average_1decade <- mean((ca-ci.leaf.photo)[1:10])
-ci.scenario3 <-ca-caci.average_1decade
+caci.average_1decade <- mean((ca.ppm-ci.leaf.photo.ppm)[1:10])
+ci.scenario3 <-ca.ppm-caci.average_1decade
 
 ```
 Plot the observed ci with the predicted ci following the 3 scenarios:
 ```{r}
-ts.plot(ci.leaf.photo,ylab="ci (pa)",xlab="Years", main="", ylim=c(15,25))
+ts.plot(ci.leaf.photo.ppm,ylab="ci (pa)",xlab="Years", main="", ylim=c(177,300))
 lines(ci.scenario1, lty=2, col="#F2AD00",lwd=2)
-lines(ci.scenario2, lty=6, col="#F2AD00",lwd=2)
+lines(ci.scenario2, lty=5, col="#F2AD00",lwd=3)
 lines(ci.scenario3, lty=3, col="#F2AD00",lwd=2)
 legend("topleft",c("ci-observed", "ci constant","ci/ca constant","ca-ci constant"),
-       lty= c(1,2,6,3), lwd=c(1,2,2,2),bty = "n", col=c("black","#F2AD00","#F2AD00","#F2AD00"),
+       lty= c(1,2,5,3), lwd=c(1,2,3,2),bty = "n", col=c("black","#F2AD00","#F2AD00","#F2AD00"),
        text.col=c("black","#F2AD00","#F2AD00","#F2AD00"), ncol=1)
 ```
 
-Question 14: Does the observed ci (derived from tree rings) follow any of the 3 scenarios or a dynamic strategy?
+Question 14: Does the observed ci (derived from tree rings) follow any of the 3 scenarios or a dynamic strategy (switching betwen different strategies)?
 
 Question 15: Does the observed ci follow a scenario consistently throughout the record?
 
-Compute iwue following the three scenarios (using ci for 3 scenarios from above) and plot with observed iwue:
-```{r}
-# iwue.scenario1 <- 
-```
-
 ## Discussion 
 
-From Notebook 1, you assessed climate correlations between 13C and climate variables. Based on the climate trends and tree ring d13C sensitivity to these climate factors/trends, answer the following:
+Based on climate trends at the LIL site and tree ring d13C sensitivity to these climate factors/trends, discussed in Notebook1, answer the following:
 
 Question 16: How do you interpret the change (increase) in iwue?
 
